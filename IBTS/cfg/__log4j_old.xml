@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+<appender name="main" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="File" value="/Users/pankstep/log/TBroker/application.log"/>
+	<param name="Append" value="true" />
+	<param name=DatePattern" value="'.'yyyy-MM-dd"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+	</layout>
+</appender>
+<appender name="pool_appender" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="File" value="/Users/pankstep/log/TBroker/pool.log"/>
+	<param name="Append" value="true" />
+	<param name=DatePattern" value="'.'yyyy-MM-dd"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+	</layout>
+</appender>
+<appender name="log_in" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="File" value="/Users/pankstep/log/TBroker/log_in.log"/>
+	<param name="Append" value="true" />
+	<param name=DatePattern" value="'.'yyyy-MM-dd"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+	</layout>
+</appender>
+<appender name="log_out" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="File" value="/Users/pankstep/log/TBroker/log_out.log"/>
+	<param name="Append" value="true" />
+	<param name=DatePattern" value="'.'yyyy-MM-dd"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+	</layout>
+</appender>
+<appender name="history" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="File" value="/Users/pankstep/log/TBroker/history.log"/>
+	<param name="Append" value="true" />
+	<param name=DatePattern" value="'.'yyyy-MM-dd"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d: %-17x{callID}:: %m%n"/>
+	</layout>
+</appender>
+<!--  
+<appender name="main" class="org.apache.log4j.ConsoleAppender">
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+	</layout>
+</appender>
+-->
+
+<category name="CallHistory">
+	<priority value="INFO"/>
+	<appender-ref ref="history"/>
+</category>
+
+<category name="com.ibts">
+	<priority value="ALL"/>
+	<appender-ref ref="main"/>
+</category>
+
+<category name="com.pancorp">
+	<priority value="ALL"/>
+	<appender-ref ref="main"/>
+</category>
+
+<category name="com.rogers.dao.pool">
+	<priority value="ALL"/>
+	<appender-ref ref="pool_appender"/>
+</category>
+
+<category name="ROOT">
+	<priority value="OFF"/>
+</category>
+
+</log4j:configuration>
