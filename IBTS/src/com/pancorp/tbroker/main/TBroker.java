@@ -17,28 +17,31 @@ import com.pancorp.tbroker.strategy.IStrategy;
 import com.pancorp.tbroker.strategy.StrategyAbstract;
 import com.pancorp.tbroker.strategy.StrategySelector;
 
-import com.pancorp.tbroker.util.TLogger;
+//import com.pancorp.tbroker.util.TLogger;
 import com.pancorp.tbroker.util.Utils;
 
 /**
  * @author 
  *
  */
-public class Main {
-	private static Logger lg = LogManager.getLogger(Main.class);
+public class TBroker{
+	private static Logger lg = LogManager.getLogger(TBroker.class);
 	
-	private static void init() throws Exception {
-		
+	private static void init(String[] args) throws Exception {
+		if(lg.isTraceEnabled())
+		lg.trace("init: ");
 	}
 
 	/**
 	 * @param args
+	 * 	properties file name
+	 *  
 	 */
 	public static void main(String[] args) {
 		
 		//1. Initialize global properties and variables
 		try {
-			init();
+			init(args);
 		}
 		catch(Exception e){
 			Utils.logError(lg, e);
@@ -46,17 +49,39 @@ public class Main {
 		
 		//2. Check the account amount and margin
 		//2.a. Initialize TBrokerApi
-		IConnectionHandler connHandler = new TBrokerApi();
+		TBrokerApi api = new TBrokerApi();
+		api.invoke();
 		
-		//////////////////////////////////////////////////////
-		///	END OF CHECKING ACCOUNT AND MARGIN ///////////////
-		//////////////////////////////////////////////////////
+		//TWrapper w = new TWrapper();
+		//w.connect();
+		
+		if(api.isConnected()){
+			lg.trace("connected");
+/*
+		
+		try {
+			
+			for(int i=5;i>0;i--){
+			lg.trace("disconnecting in "+i+" sec");
+			Thread.sleep(1000);
+			
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+			api.disconnect();
+			*/
+		}
+
+
 		
 		//////////////////////////////////////////////////////
 		//3. Start DataAnalizer
 		//////////////////////////////////////////////////////
 		// TODO figure out relations between DataAnalyzer, Strategy, StrategySelector and TBrokerApi
-		DataAnalyzer da = new DataAnalyzer();
+	/*	DataAnalyzer da = new DataAnalyzer();
 		Contract c = da.invoke();
 		/////////////////////////////////////////////////////
 		
@@ -68,7 +93,7 @@ public class Main {
 		
 		//try {
 			//strategy.join();
-		strategy.start();
+		//strategy.start();
 		//} catch (InterruptedException e) {
 			
 		//	e.printStackTrace();
@@ -90,7 +115,7 @@ public class Main {
 			}
 		}
 		//strategy exits, or force closing, if end of day
-		
+		*/
 		
 		//record trade stats
 

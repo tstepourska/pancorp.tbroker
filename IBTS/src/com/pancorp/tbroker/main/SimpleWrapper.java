@@ -1,13 +1,16 @@
 /* Copyright (C) 2013 Interactive Brokers LLC. All rights reserved.  This code is subject to the terms
  * and conditions of the IB API Non-Commercial License or the IB API Commercial License, as applicable. */
 
-package com.ibts.samples.rfq;
+package com.pancorp.tbroker.main;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.ibts.client.CommissionReport;
 import com.ibts.client.Contract;
@@ -21,11 +24,12 @@ import com.ibts.client.UnderComp;
 
 
 public class SimpleWrapper implements EWrapper {
+	private static Logger lg = LogManager.getLogger(SimpleWrapper.class);
 	private static final int MAX_MESSAGES = 1000000;
 	private final static SimpleDateFormat m_df = new SimpleDateFormat("HH:mm:ss"); 
 
 	// main client
-	private EClientSocket m_client = new EClientSocket(this);
+	private EClientSocket m_client;// = new EClientSocket(this);
 
 	public EClientSocket getM_client() {
 		return m_client;
@@ -44,6 +48,7 @@ public class SimpleWrapper implements EWrapper {
 	protected EClientSocket client() { return m_client; }
 
 	protected SimpleWrapper() {
+		//init client in the child constructor
 		initNextOutput();
 		attachDisconnectHook(this);
 	}
@@ -313,11 +318,12 @@ public class SimpleWrapper implements EWrapper {
 	}
 
 	private void initNextOutput() {
-		try {
-			m_output = new PrintStream(new File("sysout_" + (++m_outputCounter) + ".log"));
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
-		}		
+		//try {
+			//m_output = new PrintStream(new File("sysout_" + (++m_outputCounter) + ".log"));
+			m_output = new PrintStream(System.out);
+		//} catch (IOException ioe) {
+		//	ioe.printStackTrace();
+		//}		
 	}
 
 	private static void attachDisconnectHook(final SimpleWrapper ut) {

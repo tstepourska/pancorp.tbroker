@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- logger automatically checks configuration for changes every 30 secs -->
+<Configuration status="INFO" monitorInterval="30">
+	<Properties>
+        <Property name="logdir">/Users/pankstep/log/TBroker/</Property>
+    </Properties>
+    <Appenders>
+        <Console name="main" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+         <Console name="inlog" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+         <Console name="outlog" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+    </Appenders>
+    <Loggers>
+    	<Logger name="com.pancorp" level="trace">
+      		<AppenderRef ref="main"/>
+    	</Logger>
+    	<Logger name="InLog" level="trace">
+      		<AppenderRef ref="inlog"/>
+    	</Logger>
+    	<Logger name="OutLog" level="trace">
+      		<AppenderRef ref="outlog"/>
+    	</Logger>
+        <Root level="OFF">
+           <!--<AppenderRef ref="Console" />-->
+            <!-- <AppenderRef ref="pool"/>-->
+        </Root>
+    </Loggers>
+</Configuration>

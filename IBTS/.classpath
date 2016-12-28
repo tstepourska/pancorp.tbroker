@@ -4,5 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/log4j-api-2.7.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-core-2.7.jar"/>
+	<classpathentry kind="lib" path="lib/httpclient-4.2.3.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.1.40-bin.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

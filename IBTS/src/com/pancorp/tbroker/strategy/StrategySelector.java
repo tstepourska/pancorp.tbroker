@@ -1,4 +1,4 @@
-package com.pancorp.tbroker.data;
+package com.pancorp.tbroker.strategy;
 
 import com.ibts.client.Contract;
 

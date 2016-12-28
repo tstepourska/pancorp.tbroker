@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
+
+import org.apache.logging.log4j.LogManager;
+
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -35,6 +38,8 @@ import com.ibts.controller.Types.NewsType;
 import com.ibts.controller.Types.WhatToShow;
 
 public class ApiController implements EWrapper {
+	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(ApiController.class);
+	
 	private ApiConnection m_client;
 	private final ILogger m_outLogger;
 	private final ILogger m_inLogger;
@@ -83,6 +88,14 @@ public class ApiController implements EWrapper {
 	public void connect( String host, int port, int clientId) {
 		m_client.eConnect(host, port, clientId);
 		sendEOM();
+	}
+	
+	public ApiConnection getM_client() {
+		return m_client;
+	}
+
+	public void setM_client(ApiConnection m_client) {
+		this.m_client = m_client;
 	}
 
 	public void disconnect() {
@@ -400,6 +413,8 @@ public class ApiController implements EWrapper {
 
     public void reqTopMktData(NewContract contract, String genericTickList, boolean snapshot, ITopMktDataHandler handler) {
     	int reqId = m_reqId++;
+    	if(lg.isTraceEnabled())
+    		lg.trace("reqTopMktData: reqId: " + reqId);
     	m_topMktDataMap.put( reqId, handler);
     	m_client.reqMktData( reqId, contract.getContract(), genericTickList, snapshot, Collections.<TagValue>emptyList() );
 		sendEOM();

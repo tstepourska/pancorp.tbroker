@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration debug="true" xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+<appender name="main" class="org.apache.log4j.ConsoleAppender">
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+	</layout>
+</appender>
+
+ <appender name="log_in" class="org.apache.log4j.net.SocketAppender">
+    <PatternLayout pattern="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+</appender>
+<appender name="log_out"  class="org.apache.log4j.net.SocketAppender">
+    <PatternLayout pattern="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
+</appender>
+
+<category name="LogIn">
+	<priority value="INFO"/>
+	<appender-ref ref="log_in"/>
+</category>
+<category name="LogOut">
+	<priority value="INFO"/>
+	<appender-ref ref="log_out"/>
+</category>
+
+  <root> 
+    <priority value ="trace" /> 
+    <appender-ref ref="main" /> 
+  </root>
+
+</log4j:configuration>

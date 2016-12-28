@@ -2,103 +2,222 @@ package com.pancorp.tbroker.main;
 
 import java.util.ArrayList;
 
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.ibts.controller.ApiConnection.ILogger;
-import com.ibts.controller.AccountSummaryTag;
 import com.ibts.controller.ApiController;
-import com.ibts.controller.ApiController.IAccountHandler;
-import com.ibts.controller.ApiController.IAccountSummaryHandler;
-import com.ibts.controller.ApiController.IBulletinHandler;
+import com.ibts.client.Contract;
+import com.ibts.client.ScannerSubscription;
+import com.ibts.contracts.StkContract;
+import com.ibts.controller.AccountSummaryTag;
+//import com.ibts.controller.ApiController;
+//import com.ibts.controller.ApiController.IAccountHandler;
+//import com.ibts.controller.ApiController.IAccountSummaryHandler;
+//import com.ibts.controller.ApiController.IBulletinHandler;
 import com.ibts.controller.ApiController.IConnectionHandler;
+import com.ibts.controller.ApiController.IContractDetailsHandler;
+import com.ibts.controller.ApiController.IDeepMktDataHandler;
+import com.ibts.controller.ApiController.IHistoricalDataHandler;
+import com.ibts.controller.ApiController.IOrderHandler;
 import com.ibts.controller.ApiController.ITimeHandler;
+import com.ibts.controller.ApiController.IRealTimeBarHandler;
+import com.ibts.controller.ApiController.IScannerHandler;
+import com.pancorp.tbroker.market.ITopMktDataHandler;
+import com.pancorp.tbroker.market.MarketDataObject;
+import com.pancorp.tbroker.market.MarketDataObject.BarResultsObject;
+import com.pancorp.tbroker.market.MarketDataObject.ScannerResultsObject;
+import com.pancorp.tbroker.market.ContractInfoObject.DetailsResultsObject;
+import com.pancorp.tbroker.market.TopMktDataAdapter;
+import com.pancorp.tbroker.util.Globals;
 import com.ibts.controller.Formats;
+import com.ibts.controller.NewContract;
+import com.ibts.controller.NewOrder;
+import com.ibts.controller.NewTickType;
+import com.ibts.controller.OrderType;
+import com.ibts.controller.Types;
+import com.ibts.controller.Types.Action;
+import com.ibts.controller.Types.BarSize;
+import com.ibts.controller.Types.DurationUnit;
+import com.ibts.controller.Types.MktDataType;
 import com.ibts.controller.Types.NewsType;
-import com.pancorp.tbroker.util.TLogger;
+import com.ibts.controller.Types.SecType;
+//import com.pancorp.tbroker.util.TLogger;
+//import com.pancorp.tbroker.main.TWrapper.ITimeHandler;
+import com.ibts.controller.Types.WhatToShow;
 
-public class TBrokerApi implements IConnectionHandler {
-	private static Logger lg = LogManager.getLogger(TBrokerApi.class);
+public class TBrokerApi implements IConnectionHandler 
+{
+	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(TBrokerApi.class);
 
-	static TBrokerApi INSTANCE = new TBrokerApi();
-
-	private final ILogger m_inLogger = new TLogger(LogManager.getLogger("InLog"));
-	private final ILogger m_outLogger = new TLogger(LogManager.getLogger("InLog"));
-	private final ApiController m_controller = new ApiController( this, m_inLogger, m_outLogger);
+	private final ILogger inLogger = new Logger(null); //LogManager.getLogger("InLog"));
+	private final ILogger outLogger = new Logger(null);//LogManager.getLogger("OutLog"));
+	//private final TWrapper m_controller = new TWrapper();// this, m_inLogger, m_outLogger);
+	private final ApiController wrapper = new ApiController(this, inLogger, outLogger);
 	private final ArrayList<String> m_acctList = new ArrayList<String>();
 
 	// getter methods
 	public ArrayList<String> accountList() 	{ return m_acctList; }
-	public ApiController controller() 		{ return m_controller; }
-	
-	public static void main(String[] args) {
-		INSTANCE.run();
-	}
-	
-	private void run() {
-        String m_port = "7497"; //default 7496
-        String m_clientId = "0";  //default 0
-        String m_host = "127.0.0.1";
-        
-        // make initial connection to local host, port 7496, client id 0
-		//m_controller.connect( "127.0.0.1", 7496, 0);
-		
-		int port = Integer.parseInt( m_port );
-		int clientId = Integer.parseInt( m_clientId);
-		m_controller.connect( m_host, port, clientId);
+	public ApiController controller() 		{ return wrapper; }
+
+	public void invoke() {
+		if(lg.isTraceEnabled())
+			lg.trace("Client #" + Globals.clientId + " connecting to " + Globals.host + " on port " + Globals.port);
+		wrapper.connect( Globals.host, Globals.port, Globals.clientId);
 		
 		//////////////////////////////////////////
+		if(!wrapper.getM_client().isConnected()){
+			lg.error("Could not connect");
+			return;
+		}
 		connected();
 		
-		//
-		//Request account summary
-		String group = "All"; //pass All to get all accounts summary
-		AccountSummaryTag[] tags = null; //??
-		IAccountSummaryHandler accSummHandler = null; //??
-		m_controller.reqAccountSummary(group, tags, accSummHandler);
-		//TODO assign total account amount to application global variable
+		NewContract contract = new NewContract();
+		contract.secType(Types.SecType.STK);
+		contract.symbol("IBM");
+		contract.currency("USD");
+		contract.exchange("ISLAND"); //ISLAND		
+		//contract.primaryExch("");
 		
-		//OR 
-		/*
-		boolean subscribe = false;//??
-		String acctCode = null; //??
-		//TODO  implement IAccountHandler without Swing
-		IAccountHandler handler = null; //new AccountInfoPanel();
-		m_controller.reqAccountUpdates(subscribe, acctCode, handler);
+		//String genericTickList = null;
+		//boolean snapshot = true;
+		//ITopMktDataHandler handler = null;
+		//TopMktDataAdapter h1 = new TopMktDataAdapter();
+		
+        //if(lg.isTraceEnabled())
+        //lg.trace("requesting Top Market Data");
+		//wrapper.reqTopMktData(contract, genericTickList, snapshot, h1);
+		
+		//m_controller.tickPrice(reqId, tickType, price, canAutoExecute);
+		
+		//if(lg.isTraceEnabled())
+		 //       lg.trace("requesting Frozen Market Data");
+		//int reqId=10;
+		//int marketDataType = 2; //2-frozen;  1- realtime
+		//wrapper.marketDataType(reqId, marketDataType) ;
+		//cancel
+		//wrapper.cancelTopMktData(h1);
+		
+		//cancel market data
+		//wrapper.cancelTopMktData(stockListener);//cancelMktData(tickerId);
+		
+		//request market depth
+		//int numRows = 7;
+		//IDeepMktDataHandler h2 = new MarketDataObject.DeepResultsObject();
+		//wrapper.reqDeepMktData(contract, numRows, h2);
+		//cancel
+		//wrapper.cancelDeepMktData(h2);
+		
+		//request historical data
+		int tickerId = 1;
+		Contract ctrct = new Contract();
+		ctrct.m_exchange = "ISLAND";
+		//ctrct.m_symbol("IBM");
+		String endDateTime = "20161224 11:30:25 EST"; //yyyymmdd hh:mm:ss tmz
+		//int formatDate - client: 1 -- dates applying to bars returned in the format: yyyymmdd{space}{space}hh:mm:dd
+		//						   2 - dates are returned as a long integer specifying the number of seconds since 1/1/1970 GMT.
+		/*int duration = 5;
+		DurationUnit durationUnit = Types.DurationUnit.DAY; 
+		BarSize barSize = Types.BarSize._10_mins;
+		WhatToShow whatToShow = Types.WhatToShow.TRADES;*/
+		boolean rthOnly = true; //get data for regular trading hours only (no outside trading hrs)
+		/*IHistoricalDataHandler h3 = new MarketDataObject.BarResultsPanel(true);
+		wrapper.reqHistoricalData(contract, endDateTime, duration, durationUnit, barSize, whatToShow, rthOnly, h3);
+		//cancel
+		wrapper.cancelHistoricalData(h3);
 		*/
+		/*
+		//request real time bars
+		WhatToShow whatToShow = Types.WhatToShow.TRADES;
+		IRealTimeBarHandler h4 = new BarResultsObject(false); // boolean historical
+		wrapper.reqRealTimeBars(contract, whatToShow, rthOnly, h4);
+		//cancel
+		wrapper.cancelRealtimeBars(h4);
+		*/
+		
+		/*
+		//request market scanner subscription
+		ScannerSubscription sub = new ScannerSubscription();
+		//sub. what to set?\ for subscription?	 
+		IScannerHandler h5 = new ScannerResultsObject();
+		wrapper.reqScannerParameters(h5);  //returns XML file with all valid scan codes
+		wrapper.reqScannerSubscription(sub, h5);
+		//end of a snapshot:
+		int reqId = 3; //remember your started reqId!
+		wrapper.scannerDataEnd(reqId);
+		//cancel
+		wrapper.cancelScannerSubscription(h5);
+		*/
+		
+		// request contract details
+		/*IContractDetailsHandler h6 = new DetailsResultsObject();
+		wrapper.reqContractDetails(contract, h6);
+		*/
+		
+		//placing an order
+		NewOrder order = new NewOrder();
+		String v = "AccountNumber";
+		order.account(v);
+		order.action(Action.BUY);
+		int clientId = 1;
+		order.totalQuantity(100);
+		order.clientId(clientId);
+		order.orderId(1);
+		order.orderType(OrderType.LMT);
+		order.lmtPrice(35.37D);
+		//IOrderHandler h7 = new IOrderHandler();
+		//wrapper.placeOrModifyOrder(contract, order, h7);
     }
 	
-	@Override public void connected() {
+	public void connected() {
+		//if(lg.isTraceEnabled())
+		//	lg.trace("connected");
 		show( "connected");
 		//m_connectionPanel.m_status.setText( "connected");
 		
-		m_controller.reqCurrentTime( new ITimeHandler() {
+		wrapper.reqCurrentTime( new ITimeHandler() {
 			@Override public void currentTime(long time) {
 				show( "Server date/time is " + Formats.fmtDate(time * 1000) );
 			}
 		});
 		
-		m_controller.reqBulletins( true, new IBulletinHandler() {
+		/*m_controller.reqBulletins( true, new IBulletinHandler() {
 			@Override public void bulletin(int msgId, NewsType newsType, String message, String exchange) {
 				String str = String.format( "Received bulletin:  type=%s  exchange=%s", newsType, exchange);
 				show( str);
 				show( message);
 			}
-		});
+		});*/
 	}
 	
-	@Override public void disconnected() {
+	public boolean isConnected(){
+		return wrapper.getM_client().isConnected();
+	}
+	
+	public void disconnect() {
+		wrapper.disconnect();
+	}
+	
+	public void disconnected() {
 		show( "disconnected");
 		//m_connectionPanel.m_status.setText( "disconnected");
 	}
 
-	@Override public void accountList(ArrayList<String> list) {
+	public void accountList(ArrayList<String> list) {
 		show( "Received account list");
 		m_acctList.clear();
 		m_acctList.addAll( list);
+		
+		if(lg.isTraceEnabled())
+		for(String s: m_acctList){
+			lg.trace("accountList: " + s);
+		}
 	}
 
-	@Override public void show( final String str) {
+	public void show( final String str) {
 		/*SwingUtilities.invokeLater( new Runnable() {
 			@Override public void run() {
 				m_msg.append(str);
@@ -112,12 +231,31 @@ public class TBrokerApi implements IConnectionHandler {
 		lg.info(str);
 	}
 
-	@Override public void error(Exception e) {
-		show( e.toString() );
+	public void error(Exception e) {
+		show("Error: " + e.toString() );
 	}
 	
-	@Override public void message(int id, int errorCode, String errorMsg) {
-		show( id + " " + errorCode + " " + errorMsg);
+	public void message(int id, int errorCode, String errorMsg) {
+		show("Message: " + id + " " + errorCode + " " + errorMsg);
+	}
+	
+	private static class Logger implements ILogger {
+		final private JTextArea m_area;
+
+		Logger( JTextArea area) {
+			m_area = area;
+		}
+
+		@Override public void log(final String str) {
+			SwingUtilities.invokeLater( new Runnable() {
+				@Override public void run() {
+//					m_area.append(str);
+//					
+//					Dimension d = m_area.getSize();
+//					m_area.scrollRectToVisible( new Rectangle( 0, d.height, 1, 1) );
+				}
+			});
+		}
 	}
 	
 }

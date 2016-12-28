@@ -11,8 +11,11 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Vector;
 
-public class EClientSocket {
+import org.apache.logging.log4j.LogManager;
 
+public class EClientSocket {
+	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(EClientSocket.class);
+	
     // Client version history
     //
     // 	6 = Added parentId to orderStatus
@@ -240,12 +243,15 @@ public class EClientSocket {
 
         m_clientId = clientId;
         m_extraAuth = extraAuth;
+        
+        lg.debug("eConnect: host: " + host);
 
         if(host == null){
             return;
         }
         try{
             Socket socket = new Socket( host, port);
+            lg.debug("eConnect: created socket: " + socket);
             eConnect(socket);
         }
         catch( Exception e) {
@@ -285,6 +291,7 @@ public class EClientSocket {
 
         // create io streams
         m_dos = new DataOutputStream( socket.getOutputStream() );
+        lg.trace("eConnect: created data output stream: " + m_dos);
 
         // set client version
         send( CLIENT_VERSION);
@@ -295,12 +302,13 @@ public class EClientSocket {
 
         // check server version
         m_serverVersion = m_reader.readInt();
-        System.out.println("Server Version:" + m_serverVersion);
+        lg.info("eConnect: Server Version:" + m_serverVersion);
         if ( m_serverVersion >= 20 ){
             m_TwsTime = m_reader.readStr();
-            System.out.println("TWS Time at connection:" + m_TwsTime);
+            lg.info("eConnect: TWS Time at connection:" + m_TwsTime);
         }
         if( m_serverVersion < SERVER_VERSION) {
+        	lg.error("eConnect: server version is not correct: "+EClientErrors.UPDATE_TWS.msg());
         	eDisconnect();
             m_anyWrapper.error( EClientErrors.NO_VALID_ID, EClientErrors.UPDATE_TWS.code(), EClientErrors.UPDATE_TWS.msg());
             return;
@@ -308,6 +316,7 @@ public class EClientSocket {
 
         // set connected flag
         m_connected = true;
+        lg.info("eConnect: set m_connected to true: " + this.m_connected);
 
         // Send the client id
         if ( m_serverVersion >= 3 ){
@@ -320,7 +329,7 @@ public class EClientSocket {
         }
 
         m_reader.start();
-
+        lg.info("eConnect: m_reader started");
     }
 
     public synchronized void eDisconnect() {
@@ -409,6 +418,7 @@ public class EClientSocket {
     }
 
     public synchronized void reqScannerParameters() {
+    	lg.trace("Called reqScannerParameters");
         // not connected?
         if( !m_connected) {
             notConnected();
