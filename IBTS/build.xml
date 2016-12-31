@@ -1,7 +1,63 @@
 <?xml version="1.0" ?>
 <!-- Configuration of the Ant build system to generate a Jar file -->
-<project name="TestMain" default="CreateJar">
-	<target name="CreateJar" description="Create Jar file">
-		<jar jarfile="../../javaclient.jar" basedir="bin" includes="**/*.class" />
+<project name="TBroker" default="all" basedir=".">
+	<property name="build" value="${basedir}/build"/>
+	<property name="lib" value="${basedir}/lib"/>
+	<property name="src" value="${basedir}/src"/>
+	<property name="classes" value="${build}/classes"/>
+	<property name="deploy" value="${build}/deploy"/>
+	
+	<property name="compile.debug" value="false"/>
+	<property name="compile.deprecation" value="false"/>
+	<property name="compile.optimize" value="true"/>
+	
+	<property name="app_jar" value="${deploy}/tbroker.jar"/>
+	<property name="app_dir" value="/Users/pankstep/run/TBroker"/>
+	
+	<path id="compile.classpath">
+		<fileset dir="${lib}">
+			<include name="*.jar"/>
+		</fileset>
+		<pathelement location="${classes}"/>
+	</path>
+	
+	<target name="all" description="compile and deploy" depends="compile,jar,deploy"/>
+	
+	<target name="compile" description="compile source code">
+		<javac classpath="$classpath" destdir="${classes}" srcdir="${src}/com" includeantruntime="false">
+			<classpath refid="compile.classpath"/>
+			</javac>
 	</target>
+	
+	<target name="jar" description="Create Jar file" depends="compile">
+		<jar jarfile="${app_jar}" basedir="${classes}" includes="**/*.class" />
+	</target>
+	
+	<target name="deploy" description="deploy all files" depends="jar">
+		<copy todir="${app_dir}/cfg">
+			<fileset dir="${basedir}/cfg">
+				<include name="log4j.xml"/>
+				<include name="ftp.nasdaqlist.properties"/>
+			</fileset>
+		</copy>
+		<copy todir="${app_dir}/lib">
+			<fileset dir="${basedir}/lib">
+				<include name="commons-net-3.5.jar"/>
+				<include name="log4j-api-2.7.jar"/>
+				<include name="log4j-core-2.7.jar"/>
+				<include name="mysql-connector-java-5.1.40-bin.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${app_dir}/lib">
+			<fileset dir="${deploy}">
+				<include name="tbroker.jar"/>
+			</fileset>
+		</copy>
+		<copy todir="${app_dir}/bin">
+			<fileset dir="${basedir}/bin">
+				<include name="listloader"/>
+			</fileset>
+		</copy>
+	</target>
+
 </project>

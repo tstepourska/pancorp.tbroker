@@ -1,5 +1,6 @@
 package com.pancorp.tbroker.market;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,13 +10,21 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Vector;
 
 import org.apache.logging.log4j.LogManager;
 
-
+import com.pancorp.tbroker.data.DataFactory;
+import com.pancorp.tbroker.data.YahooMarketDataRecord;
 import com.pancorp.tbroker.util.Globals;
 import com.pancorp.tbroker.util.Utils;
 
@@ -91,41 +100,105 @@ import com.pancorp.tbroker.util.Utils;
 
 public class YahooMarketDataLoader {
 	
-	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(MarketScannerWrapper.class);
+	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(YahooMarketDataLoader.class);
 	
-	private int counter = 0;
 	private LinkedList<String> tickers;
+	//private String tStamp;
+	LinkedList<String[]> tkrBuffer = null;
 	
-	public YahooMarketDataLoader(LinkedList<String> tt) {
-		this.tickers = tt;
+	public YahooMarketDataLoader() {
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
+		//tStamp = df.format(ts);
 	}
 	
 	public void invoke(){
-		while(!this.tickers.isEmpty()){
-			try {
-			query(buildUrl());
+		int recordCounter = 0;
+		try {		
+			tickers = DataFactory.getTickerList();
+			if(lg.isDebugEnabled())
+				lg.debug("Found " + tickers.size() + " tickers");
+
+			tkrBuffer = new LinkedList<>();
+		
+			while(!this.tickers.isEmpty()){
+				//fill up the tkr buffer with max number of tickers
+				for(int i=0;i<Globals.YAH_MAX_TICKERS;i++){
+					if(this.tickers.isEmpty())
+						break;
+				
+					tkrBuffer.add((this.tickers.removeFirst()).split(","));
+				}		
+			
+				recordCounter = tkrBuffer.size();
+				if(lg.isDebugEnabled())
+					lg.debug("Loading next " + recordCounter + " records..");
+				
+				String ur = this.buildUrl(tkrBuffer);
+				int result = query(ur, tkrBuffer);
+				
+				if(lg.isDebugEnabled())
+					lg.debug("Loaded "+result + " records");
 			}
-			catch(Exception e){
-				Utils.logError(lg, e);
-			}
+		}
+		catch(Exception e){
+			Utils.logError(lg, e);
 		}
 	}
 	
-	private String buildUrl(){
+	/**
+	 * 
+	 * @param li
+	 * @return
+	 */
+	private String buildUrl(LinkedList<String[]> li){
+		Iterator<String[]> it = li.iterator();
 		int tickCount = 0;
+		StringBuilder ur = new StringBuilder();
+		
+		//append start of URL
+		ur.append(Globals.YAH_DATA);
+		
+		while(it.hasNext()){	
+			if(tickCount>0)
+				ur.append("+");
+
+			ur.append(it.next()[0]);
+			tickCount++;
+		}
+
+		//append parameter tags
+		ur.append(Globals.YAH_QUERY_TAGS);
+		
+		String r = ur.toString();		
+		if(lg.isDebugEnabled())
+			lg.debug("buildUrl: result: " + r);
+		
+		return r;
+	}
+	
+	/**
+	 * Builds URL for a single ticker.
+	 * Use for testing only!
+	 * 
+	 * @param ticker
+	 * @return
+	 */
+/*	private String buildUrl(String ticker){
+		
 		StringBuilder ur = new StringBuilder();
 		ur.append(Globals.YAH_DATA);
 		
-		while(!this.tickers.isEmpty()){		
-			ur.append(this.tickers.remove());
-			tickCount++;
+		//while(!this.tickers.isEmpty()){		
+			ur.append(ticker);
+			//tickCount++;
 			
-			if(tickCount<(Globals.YAH_MAX_TICKERS-1))
-				ur.append("+");
+			//if(tickCount<(Globals.YAH_MAX_TICKERS-1))
+			//	ur.append("+");
 			
-			if(tickCount>=Globals.YAH_MAX_TICKERS)
-				break;
-		}
+			//if(tickCount>=Globals.YAH_MAX_TICKERS)
+			//	break;
+		//}
 		
 		ur.append(Globals.YAH_QUERY_TAGS);
 		
@@ -135,45 +208,98 @@ public class YahooMarketDataLoader {
 			lg.debug("buildUrl: result: " + r);
 		
 		return r;
-	}
+	}*/
 	
-	private void query(String u) throws Exception{
+	private int query(String u, LinkedList<String[]> buff) throws Exception{
 		
 		URL url = null;
 		HttpURLConnection http = null;	
-		InputStreamReader reader = null;
-		FileWriter os = null;
+		BufferedReader r = null;	
+		//int lineCounter = 0;
+		String line = null;
+		
+		Connection con = null;
+		PreparedStatement ps = null;
+		int result = 0;
+		
+		String[] arr;
+		String exchange = null;
 		
 		try {
+			YahooMarketDataRecord rec = new YahooMarketDataRecord();
 			url = new URL(u);
 			http = (HttpURLConnection)url.openConnection();
 			http.connect();
-			reader = new InputStreamReader(http.getInputStream());
+			r = new BufferedReader(new InputStreamReader(http.getInputStream()));
 			
-			counter++;
-			os = new FileWriter(Globals.BASEDIR+Globals.DATADIR + "yahoo_data_" + counter);
-			int c;
-			while((c=reader.read())!=1){
-				os.write(c);
+			Class.forName(DataFactory.db_driver);  
+			con=DriverManager.getConnection(DataFactory.db_url,DataFactory.db_user,DataFactory.db_password);  
+			ps = con.prepareStatement(DataFactory.sqlInsertYahMarketData);
+			
+			//lineCounter++;
+			//os = new FileWriter(Globals.BASEDIR+Globals.DATADIR + "yahoo_data_" + counter + "_" + tStamp);
+			while(!buff.isEmpty()){
+			//while((line=r.readLine())!=null){
+				arr = buff.removeFirst();
+				line=r.readLine();
+				if(arr[1]==null || arr[1].trim().length()<=0)
+					exchange = null;
+				else
+					exchange = arr[1];
+				rec.load(arr[0], line, exchange);
+				rec.loadStatement(ps);
+				result = result + ps.executeUpdate();
+				//if(lg.isTraceEnabled())
+				//lg.trace("Inserted " + result + " record(s)");
+				
+				//os.write(line);
+				//lineCounter++;
+				//if(lineCounter>3)
+				//	break;
 			}
+		}
+		catch(SQLException sqle){
+			lg.error("SQLException: code: " + sqle.getErrorCode() + ", msg: " + sqle.getMessage());
 		}
 		catch(Exception e){
 			lg.error("Error: "+ e.getMessage());
 		}
 		finally {
-			try {
+			/*try {
 				os.flush();
 				os.close();
 			}catch(Exception e1){}
-			
+			*/
 			try {
-				reader.close();
+				r.close();
 			}catch(Exception e2){}
 			
 			try {
 				http.disconnect();
 			}catch(Exception e3){}
+			
+			try {
+				ps.close();
+				}
+				catch(Exception e){
+					
+				}
+			try {
+				con.close();
+				}
+				catch(Exception e){
+					
+				}
 		}
+		
+		return result;
+	}
+	
+	//for testing only
+	public static void main(String[] args){
+		YahooMarketDataLoader ld = new YahooMarketDataLoader();
+		
+		ld.invoke();
 	}
 	
 }

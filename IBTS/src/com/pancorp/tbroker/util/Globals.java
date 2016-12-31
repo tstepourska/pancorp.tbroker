@@ -12,7 +12,7 @@ public enum Globals {
 	///////// END OF IB CONNECTION PROPERTIES /////////////
 	
 	///////
-	public static final String BASEDIR 				= "/Users/pankstep/Jts/";
+	public static final String BASEDIR 				= "/Users/pankstep/run/TBroker/";
 	public static final String DATADIR 				= "data/";
 	
 	//for IB
@@ -20,7 +20,7 @@ public enum Globals {
 	
 	//Yahoo data URL
 	public static final String YAH_DATA			= "http://finance.yahoo.com/d/quotes.csv?s=";
-	public static final int YAH_MAX_TICKERS		= 200;
+	public static final int YAH_MAX_TICKERS		= 190; // real number is 200;
 	
 	public static final String YAH_TAGS_PARAM_PREFIX					= "&f=";
 	
@@ -46,13 +46,13 @@ public enum Globals {
 	public static final String YAH_TRADE_DATA_OPEN						= "o";	//	Open
 	public static final String YAH_TRADE_DATA_DAY_HIGH					= "h";	//	Day's High
 	public static final String YAH_TRADE_DATA_DAY_LOW					= "g";	//	Day's Low
-	public static final String YAH_TRADE_DATA_DAY_RANGE					= "m";	//	Day's Range
+	//public static final String YAH_TRADE_DATA_DAY_RANGE					= "m";	//	Day's Range
 	public static final String YAH_TRADE_DATA_VOLUME					= "v";	//	Volume
 	public static final String YAH_TRADE_DATA_AVG_DAY_VOLUME			= "a2";	//	Average Daily Volume
 	public static final String YAH_TRADE_DATA_PREVIOUS_CLOSE			= "p";	//	Previous Close
 	
 	//Historical Performance:  52-week data only.
-	public static final String YAH_HISTORIC_PERFORM_52W_RANGE			= "w";	//	52-week Range
+	//public static final String YAH_HISTORIC_PERFORM_52W_RANGE			= "w";	//	52-week Range
 	public static final String YAH_HISTORIC_PERFORM_52W_HIGH			= "k";	//	52-week High
 	public static final String YAH_HISTORIC_PERFORM_52W_LOW				= "j";	//	52-week Low
 	public static final String YAH_HISTORIC_PERFORM_CHANGE_FROM_52HIGH	= "k4";	//	Change From 52-week High
@@ -82,25 +82,26 @@ public enum Globals {
 	public static final String YAH_TECH_ANALYS_PER_CHANGE_FROM_50_DAY_MA	= "m8";	//	Percent Change From 50-day Moving Average
 	
 	
-	public static final String YAH_QUERY_TAGS = YAH_TAGS_PARAM_PREFIX+
-	YAH_TRADE_DATA_ASK+
-	YAH_TRADE_DATA_BID+
-	YAH_TRADE_DATA_ASK_SIZE+
-	YAH_TRADE_DATA_BID_SIZE+
-	YAH_TRADE_DATA_LAST_TRADE_DATE+
-	YAH_TRADE_DATA_LAST_TRADE_TIME+
-	YAH_TRADE_DATA_LAST_TRADE_PRICE+
-	YAH_TRADE_DATA_LAST_TRADE_SIZE +
-	YAH_TRADE_DATA_CHANGE+
-	YAH_TRADE_DATA_CHANGE_PERCENT+
+	public static final String YAH_QUERY_TAGS = 
+				YAH_TAGS_PARAM_PREFIX+
+	YAH_TRADE_DATA_ASK+								//double
+	YAH_TRADE_DATA_BID+								//double
+	YAH_TRADE_DATA_ASK_SIZE+						//int
+	YAH_TRADE_DATA_BID_SIZE+						//int
+	YAH_TRADE_DATA_LAST_TRADE_DATE+					//Date or Timestamp
+	YAH_TRADE_DATA_LAST_TRADE_TIME+					//  ""
+	YAH_TRADE_DATA_LAST_TRADE_PRICE+				//  double
+	YAH_TRADE_DATA_LAST_TRADE_SIZE +				// int
+	YAH_TRADE_DATA_CHANGE+							// ?
+	YAH_TRADE_DATA_CHANGE_PERCENT+					// double
 	YAH_TRADE_DATA_OPEN+
 	YAH_TRADE_DATA_DAY_HIGH+
 	YAH_TRADE_DATA_DAY_LOW+
-	YAH_TRADE_DATA_DAY_RANGE+
+	//YAH_TRADE_DATA_DAY_RANGE+
 	YAH_TRADE_DATA_VOLUME+
 	YAH_TRADE_DATA_AVG_DAY_VOLUME+
 	YAH_TRADE_DATA_PREVIOUS_CLOSE+
-	YAH_HISTORIC_PERFORM_52W_RANGE+
+	//YAH_HISTORIC_PERFORM_52W_RANGE+
 	YAH_HISTORIC_PERFORM_52W_HIGH+
 	YAH_HISTORIC_PERFORM_52W_LOW	+
 	YAH_HISTORIC_PERFORM_CHANGE_FROM_52HIGH+

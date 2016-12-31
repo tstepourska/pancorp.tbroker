@@ -8,9 +8,11 @@
         <Console name="main">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
-      <!--   <File name="main" fileName="${logdir}application.log" immediateFlush="true" append="true">
+      <!--  <File name="main" fileName="${logdir}application.log" immediateFlush="true" append="true">
             <PatternLayout pattern="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
         </File>
+        -->
+        <!--
          <File name="log_in" fileName="${logdir}log_in.log" immediateFlush="true" append="true">
             <PatternLayout pattern="%d: %-5p: %-17x{callID}: %-17c{1}: %m%n"/>
         </File>
