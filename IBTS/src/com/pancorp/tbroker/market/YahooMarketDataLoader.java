@@ -105,15 +105,23 @@ public class YahooMarketDataLoader {
 	private LinkedList<String> tickers;
 	//private String tStamp;
 	LinkedList<String[]> tkrBuffer = null;
+	private ArrayList<String> emptyRecords = null;
+	private ArrayList<String> nullLines = null;
+	private ArrayList<String> notInserted = null;
+	private int loaded = 0;
 	
 	public YahooMarketDataLoader() {
 		Timestamp ts = new Timestamp(System.currentTimeMillis());
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
 		//tStamp = df.format(ts);
+		emptyRecords= new ArrayList<>();
+		nullLines= new ArrayList<>();
+		notInserted = new ArrayList<>();
 	}
 	
 	public void invoke(){
 		int recordCounter = 0;
+		int result = 0;
 		try {		
 			tickers = DataFactory.getTickerList();
 			if(lg.isDebugEnabled())
@@ -135,14 +143,21 @@ public class YahooMarketDataLoader {
 					lg.debug("Loading next " + recordCounter + " records..");
 				
 				String ur = this.buildUrl(tkrBuffer);
-				int result = query(ur, tkrBuffer);
-				
-				if(lg.isDebugEnabled())
-					lg.debug("Loaded "+result + " records");
+				result = query(ur, tkrBuffer);		
+				lg.debug("Loaded "+result + " records");
+				loaded = loaded + result;
 			}
 		}
 		catch(Exception e){
 			Utils.logError(lg, e);
+		}
+		finally{
+			lg.info("Total loaded: "+loaded + " records"); 
+			lg.info("emptyRecords: " + emptyRecords.size() + "::" + emptyRecords);
+			lg.info("nullLines: " + nullLines.size() + "::" + nullLines);
+			lg.info("Other not inserted records: " + notInserted.size() + "::" + notInserted);
+			long tot = loaded + emptyRecords.size() + nullLines.size();
+			lg.info("Total tickers checked: " + tot);
 		}
 	}
 	
@@ -215,7 +230,6 @@ public class YahooMarketDataLoader {
 		URL url = null;
 		HttpURLConnection http = null;	
 		BufferedReader r = null;	
-		//int lineCounter = 0;
 		String line = null;
 		
 		Connection con = null;
@@ -224,6 +238,7 @@ public class YahooMarketDataLoader {
 		
 		String[] arr;
 		String exchange = null;
+		boolean valid= false;
 		
 		try {
 			YahooMarketDataRecord rec = new YahooMarketDataRecord();
@@ -235,22 +250,40 @@ public class YahooMarketDataLoader {
 			Class.forName(DataFactory.db_driver);  
 			con=DriverManager.getConnection(DataFactory.db_url,DataFactory.db_user,DataFactory.db_password);  
 			ps = con.prepareStatement(DataFactory.sqlInsertYahMarketData);
-			
-			//lineCounter++;
+	
 			//os = new FileWriter(Globals.BASEDIR+Globals.DATADIR + "yahoo_data_" + counter + "_" + tStamp);
 			while(!buff.isEmpty()){
 			//while((line=r.readLine())!=null){
 				arr = buff.removeFirst();
 				line=r.readLine();
+				if(lg.isDebugEnabled())
+					lg.debug("line: " + line);
+				if(line==null){
+					nullLines.add(arr[0]+":"+arr[1]);
+					continue;
+				}
 				if(arr[1]==null || arr[1].trim().length()<=0)
 					exchange = null;
 				else
 					exchange = arr[1];
-				rec.load(arr[0], line, exchange);
+				valid = rec.load(arr[0], line, exchange);
+				if(lg.isDebugEnabled())
+					lg.debug("record valid: " + valid);
+				if(!valid){
+					emptyRecords.add(rec.getTicker()+":"+rec.getExchange());
+					continue;
+				}
+				
 				rec.loadStatement(ps);
-				result = result + ps.executeUpdate();
-				//if(lg.isTraceEnabled())
-				//lg.trace("Inserted " + result + " record(s)");
+				if(lg.isTraceEnabled())
+					lg.trace("PreparedStatement loaded ");
+				int inserted = ps.executeUpdate();
+				if(inserted==0){
+					notInserted.add(arr[0]+":"+arr[1]);
+				}
+				result = result + inserted;
+				if(lg.isTraceEnabled())
+				lg.trace("result: " + result);
 				
 				//os.write(line);
 				//lineCounter++;

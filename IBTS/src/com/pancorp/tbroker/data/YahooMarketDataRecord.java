@@ -8,6 +8,9 @@ import java.sql.SQLException;
 
 import org.apache.logging.log4j.LogManager;
 
+import com.pancorp.tbroker.util.Globals;
+import com.pancorp.tbroker.util.Utils;
+
 public class YahooMarketDataRecord {
 	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(YahooMarketDataRecord.class);
 	
@@ -66,94 +69,108 @@ public class YahooMarketDataRecord {
 		this.exchange);
 	}
 	
-	public void load(String tkr, String rec, String ex) throws Exception {
+	public boolean load(String tkr, String rec, String ex) throws Exception {
+		boolean valid = false;
 		this.ticker = tkr;
 		this.record = rec;
 		this.exchange = ex;
+		
+		if(lg.isTraceEnabled())
+			lg.trace("parseTickerRecord: ticker: " + this.ticker + ":"+this.exchange);
 		
 		//26.72,26.62,200,100,"12/29/2016","9:51am",26.70,100,+0.40,"+1.52%",26.25,26.70,26.25,
 		//"26.25 - 26.70",		//not needed
 		//5429,139067,26.30,"20.53 - 39.66",39.66,20.53,-12.96,6.17,-32.68%,+30.05%
 		
 		String arr[] = this.record.split(",");
+		if(lg.isTraceEnabled())
 		lg.trace("parseTickerRecord: arr length: " + arr.length);
 		
 		if(NA(arr[0]))
-			YAH_TRADE_DATA_ASK = -1;
-		else
+			YAH_TRADE_DATA_ASK = Globals.NA;
+		else{
 		YAH_TRADE_DATA_ASK 			= Double.parseDouble(arr[0]);	
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_ASK: " + YAH_TRADE_DATA_ASK);
 		
 		if(NA(arr[1]))
-			YAH_TRADE_DATA_BID = -1;
-		else
-		YAH_TRADE_DATA_BID 			= Double.parseDouble(arr[1]);					
+			YAH_TRADE_DATA_BID = Globals.NA;
+		else{
+		YAH_TRADE_DATA_BID 			= Double.parseDouble(arr[1]);	
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_BID: " + YAH_TRADE_DATA_BID);
 		
 		if(NA(arr[2]))
-			YAH_TRADE_DATA_ASK_SIZE = -1;
-		else
+			YAH_TRADE_DATA_ASK_SIZE = Globals.NA;
+		else{
 		YAH_TRADE_DATA_ASK_SIZE 	= Integer.parseInt(arr[2]);		
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_ASK_SIZE: " + YAH_TRADE_DATA_ASK_SIZE);
 		
 		if(NA(arr[3]))
-			YAH_TRADE_DATA_BID_SIZE = -1;
-		else
+			YAH_TRADE_DATA_BID_SIZE = Globals.NA;
+		else{
 		YAH_TRADE_DATA_BID_SIZE		= Integer.parseInt(arr[3]);		
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_BID_SIZE: " + YAH_TRADE_DATA_BID_SIZE);
 		
 		try {
-		//combine date and time into a single Timestamp field
-		YAH_TRADE_DATA_LAST_TRADE_DATE = arr[4];	
-		if(lg.isTraceEnabled())
+			//combine date and time into a single Timestamp field
+			YAH_TRADE_DATA_LAST_TRADE_DATE = arr[4];	
+			if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_LAST_TRADE_DATE: " + YAH_TRADE_DATA_LAST_TRADE_DATE);
 		
-		YAH_TRADE_DATA_LAST_TRADE_TIME = arr[5];	
-		if(lg.isTraceEnabled())
+			YAH_TRADE_DATA_LAST_TRADE_TIME = arr[5];	
+			if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_LAST_TRADE_TIME: " + YAH_TRADE_DATA_LAST_TRADE_TIME);
 		
-		Calendar cal = Calendar.getInstance();
-		String[] aa = YAH_TRADE_DATA_LAST_TRADE_DATE.split("\\/");
-		if(lg.isTraceEnabled()){
+			Calendar cal = Calendar.getInstance();
+			String[] aa = YAH_TRADE_DATA_LAST_TRADE_DATE.split("\\/");
+			if(lg.isTraceEnabled()){
 			lg.trace("date array length: "+aa.length);
 			for(int i=0;i<aa.length;i++){
 				lg.trace("date: " + aa[i]);
 			}
-		}
-		int year = Integer.parseInt(aa[2].substring(0, 4)); 
-		int month= Integer.parseInt(aa[0].substring(1))-1; 
-		int date = Integer.parseInt(aa[1]); 
-		if(lg.isTraceEnabled()){
+			}
+			int year = Integer.parseInt(aa[2].substring(0, 4)); 
+			int month= Integer.parseInt(aa[0].substring(1))-1; 
+			int date = Integer.parseInt(aa[1]); 
+			if(lg.isTraceEnabled()){
 			lg.trace("date: year="+year+", month="+month+", date="+date);
-		}
+			}
 		
-		String[] tt = YAH_TRADE_DATA_LAST_TRADE_TIME.split("\\:");
-		if(lg.isTraceEnabled()){
+			String[] tt = YAH_TRADE_DATA_LAST_TRADE_TIME.split("\\:");
+			if(lg.isTraceEnabled()){
 			for(int i=0;i<tt.length;i++){
 				lg.trace("time: " + tt[i]);
 			}
-		}
-		int hourOfDay = Integer.parseInt(tt[0].substring(1)); 
-		int minute = Integer.parseInt(tt[1].substring(0, 2));
-		String ampm = tt[1].substring(2,4);
-		int second = 0;
+			}
+			int hourOfDay = Integer.parseInt(tt[0].substring(1)); 
+			int minute = Integer.parseInt(tt[1].substring(0, 2));
+			String ampm = tt[1].substring(2,4);
+			int second = 0;
 		
-		if(ampm.equalsIgnoreCase("pm"))
+			if(ampm.equalsIgnoreCase("pm"))
 			hourOfDay = hourOfDay + 12;
-		if(lg.isTraceEnabled()){
+			if(lg.isTraceEnabled()){
 			lg.trace("time: hour="+hourOfDay+", minute="+minute+", second="+second+", ampm="+ampm);
-		}
+			}
 		
-		cal.set(year, month, date, hourOfDay, minute, second);
-		if(lg.isTraceEnabled()){
+			cal.set(year, month, date, hourOfDay, minute, second);
+			if(lg.isTraceEnabled()){
 			//lg.trace("calendar: ts: " + cal.);
-		}
-		//this.last_trade_date_time = new java.sql.Date((cal.getTime()).getTime());
-		this.last_trade_date_time = new java.sql.Timestamp(cal.getTimeInMillis());
+			}
+			//this.last_trade_date_time = new java.sql.Date((cal.getTime()).getTime());
+			this.last_trade_date_time = new java.sql.Timestamp(cal.getTimeInMillis());
+			valid = true;
 		}
 		catch(Exception e){
 			lg.error("Error parsing last trade date - time: " + e.getMessage());
@@ -163,29 +180,36 @@ public class YahooMarketDataRecord {
 			lg.trace("last_trade_date_time: " + last_trade_date_time);
 		
 		if(NA(arr[6]))
-			YAH_TRADE_DATA_LAST_TRADE_PRICE = -1;
-		else
+			YAH_TRADE_DATA_LAST_TRADE_PRICE = Globals.NA;
+		else{
 		YAH_TRADE_DATA_LAST_TRADE_PRICE = Double.parseDouble(arr[6]);		
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_LAST_TRADE_PRICE: " + YAH_TRADE_DATA_LAST_TRADE_PRICE);
 		
 		if(NA(arr[7]))
-			YAH_TRADE_DATA_LAST_TRADE_SIZE = -1;
-		else
+			YAH_TRADE_DATA_LAST_TRADE_SIZE = Globals.NA;
+		else{
 		YAH_TRADE_DATA_LAST_TRADE_SIZE  = Integer.parseInt(arr[7]);	
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_LAST_TRADE_SIZE: " + YAH_TRADE_DATA_LAST_TRADE_SIZE);
 		
 		if(NA(arr[8]))
-			YAH_TRADE_DATA_CHANGE = -1;
-		else
+			YAH_TRADE_DATA_CHANGE = Globals.NA;
+		else{
 		YAH_TRADE_DATA_CHANGE			= Double.parseDouble(arr[8]);	//! make sure it shows negative numbers correctly
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_CHANGE: " + YAH_TRADE_DATA_CHANGE);
 		
 		if(NA(arr[9]))
-			YAH_TRADE_DATA_CHANGE_PERCENT = -1;
+			YAH_TRADE_DATA_CHANGE_PERCENT = Globals.NA;
 		else{
+			try {
 		//convert String into double
 		String tmp = arr[9];
 		if(tmp.startsWith("\""))
@@ -198,94 +222,153 @@ public class YahooMarketDataRecord {
 		if(idx>-1)
 			YAH_TRADE_DATA_CHANGE_PERCENT= Double.parseDouble(tmp.substring(0, idx)); //! make sure it shows negative numbers correctly
 		else
-		YAH_TRADE_DATA_CHANGE_PERCENT	= Double.parseDouble(tmp);			//! make sure it shows negative numbers correctly		
+		YAH_TRADE_DATA_CHANGE_PERCENT	= Double.parseDouble(tmp);			//! make sure it shows negative numbers correctly	
+		
+		valid = true;
+			}
+			catch(Exception e){
+				lg.error("Error parsing YAH_TRADE_DATA_CHANGE_PERCENT: " + e.getMessage());
+				Utils.logError(lg, e);
+			}
 		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_CHANGE_PERCENT: " + YAH_TRADE_DATA_CHANGE_PERCENT);
 		
 		if(NA(arr[10]))
-			YAH_TRADE_DATA_OPEN = -1;
-		else
+			YAH_TRADE_DATA_OPEN = Globals.NA;
+		else{
 		YAH_TRADE_DATA_OPEN				= Double.parseDouble(arr[10]);
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_OPEN: " + YAH_TRADE_DATA_OPEN);
 		
 		if(NA(arr[11]))
-			YAH_TRADE_DATA_DAY_HIGH = -1;
-		else
+			YAH_TRADE_DATA_DAY_HIGH = Globals.NA;
+		else{
 		YAH_TRADE_DATA_DAY_HIGH			= Double.parseDouble(arr[11]);
+		valid = true;
+		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_TRADE_DATA_DAY_HIGH: " + YAH_TRADE_DATA_DAY_HIGH);
 		
 		if(NA(arr[12]))
-			YAH_TRADE_DATA_DAY_LOW = -1;
-		else
+			YAH_TRADE_DATA_DAY_LOW = Globals.NA;
+		else{
 		YAH_TRADE_DATA_DAY_LOW			= Double.parseDouble(arr[12]);
-		
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_TRADE_DATA_DAY_LOW: " + YAH_TRADE_DATA_DAY_LOW);
 		// not needed, derive from day high and day low
 		//YAH_TRADE_DATA_DAY_RANGE		= arr[13];
 		
 		if(NA(arr[13]))
-			YAH_TRADE_DATA_VOLUME = -1;
-		else
+			YAH_TRADE_DATA_VOLUME = Globals.NA;
+		else{
 		YAH_TRADE_DATA_VOLUME			= Integer.parseInt(arr[13]);
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_TRADE_DATA_VOLUME: " + YAH_TRADE_DATA_VOLUME);
 		
 		if(NA(arr[14]))
-			YAH_TRADE_DATA_AVG_DAY_VOLUME = -1;
-		else
+			YAH_TRADE_DATA_AVG_DAY_VOLUME = Globals.NA;
+		else{
 		YAH_TRADE_DATA_AVG_DAY_VOLUME	= Integer.parseInt(arr[14]);
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_TRADE_DATA_AVG_DAY_VOLUME: " + YAH_TRADE_DATA_AVG_DAY_VOLUME);
 		
 		if(NA(arr[15]))
-			YAH_TRADE_DATA_PREVIOUS_CLOSE = -1;
-		else
+			YAH_TRADE_DATA_PREVIOUS_CLOSE = Globals.NA;
+		else{
 		YAH_TRADE_DATA_PREVIOUS_CLOSE	= Double.parseDouble(arr[15]);
-		
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_TRADE_DATA_PREVIOUS_CLOSE: " + YAH_TRADE_DATA_PREVIOUS_CLOSE);
 		//convert String range into 2 numeric fields
 		//YAH_HISTORIC_PERFORM_52W_RANGE	= arr[17];		//
 		
 		if(NA(arr[16]))
-			YAH_HISTORIC_PERFORM_52W_HIGH = -1;
-		else
+			YAH_HISTORIC_PERFORM_52W_HIGH = Globals.NA;
+		else{
 		YAH_HISTORIC_PERFORM_52W_HIGH				= Double.parseDouble(arr[16]);
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_HISTORIC_PERFORM_52W_HIGH: " + YAH_HISTORIC_PERFORM_52W_HIGH);
 		
 		if(NA(arr[17]))
-			YAH_HISTORIC_PERFORM_52W_LOW = -1;
-		else
+			YAH_HISTORIC_PERFORM_52W_LOW = Globals.NA;
+		else{
 		YAH_HISTORIC_PERFORM_52W_LOW				= Double.parseDouble(arr[17]);
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_HISTORIC_PERFORM_52W_LOW: " + YAH_HISTORIC_PERFORM_52W_LOW);
 		
 		if(NA(arr[18]))
-			YAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH = -1;
-		else
+			YAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH = Globals.NA;
+		else{
 		YAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH		= Double.parseDouble(arr[18]);	//! make sure it shows negative numbers correctly
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH: " + YAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH);
 		
 		if(NA(arr[19]))
-			YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW = -1;
-		else
+			YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW = Globals.NA;
+		else{
 		YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW		= Double.parseDouble(arr[19]);
+		valid = true;
+		}
+		if(lg.isTraceEnabled())
+			lg.trace("YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW: " + YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW);
 		
 		if(NA(arr[20]))
-			YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH = -1;
+			YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH = Globals.NA;
 		else{
-		//convert to numeric
-		if(arr[20].indexOf("%")>-1)
-		YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH 	= Double.parseDouble(arr[20].substring(0, arr[20].length()-2)); //! make sure it shows negative numbers correctly
-		else
-			YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH 	= Double.parseDouble(arr[20]);
+			try {
+			//convert to numeric
+			if(arr[20].indexOf("%")>-1)
+				YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH 	= Double.parseDouble(arr[20].substring(0, arr[20].length()-2)); //! make sure it shows negative numbers correctly
+			else
+				YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH 	= Double.parseDouble(arr[20]);
+			
+			valid = true;
+			}
+			catch(Exception e){
+				lg.error("Error parsing YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH: " + e.getMessage());
+				Utils.logError(lg, e);
+			}
 		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH: " + YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH);
 		
 		if(NA(arr[21]))
-			YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW = -1;
+			YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW = Globals.NA;
 		else{
-		//convert to numeric
-		if(arr[21].indexOf("%")>-1)
-		YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW	= Double.parseDouble(arr[21].substring(0, arr[21].length()-2));
-		else
-			YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW 	= Double.parseDouble(arr[21]);
+			try {
+			//convert to numeric
+			if(arr[21].indexOf("%")>-1)
+				YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW	= Double.parseDouble(arr[21].substring(0, arr[21].length()-2));
+			else
+				YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW 	= Double.parseDouble(arr[21]);
+			
+			valid = true;
+			}
+			catch(Exception e){
+				lg.error("Error parsing YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW: " + e.getMessage());
+				Utils.logError(lg, e);
+			}
 		}
 		if(lg.isTraceEnabled())
 			lg.trace("YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW: " + YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW);
+		
+		return valid;
 	}
 	
 	public void loadStatement(PreparedStatement ps) throws SQLException, Exception{
@@ -557,8 +640,8 @@ public class YahooMarketDataRecord {
 		.append("\nYAH_TRADE_DATA_BID_SIZE: " + YAH_TRADE_DATA_BID_SIZE)					
 		
 		//combine date and time into a single Timestamp field
-		.append("\nYAH_TRADE_DATA_LAST_TRADE_DATE: " + YAH_TRADE_DATA_LAST_TRADE_DATE)						
-		.append("\nYAH_TRADE_DATA_LAST_TRADE_TIME: " + YAH_TRADE_DATA_LAST_TRADE_TIME)				
+		//.append("\nYAH_TRADE_DATA_LAST_TRADE_DATE: " + YAH_TRADE_DATA_LAST_TRADE_DATE)						
+		//.append("\nYAH_TRADE_DATA_LAST_TRADE_TIME: " + YAH_TRADE_DATA_LAST_TRADE_TIME)				
 		.append("\nTimestamp: " + this.last_trade_date_time)		
 		
 		.append("\nYAH_TRADE_DATA_LAST_TRADE_PRICE: " + YAH_TRADE_DATA_LAST_TRADE_PRICE)				

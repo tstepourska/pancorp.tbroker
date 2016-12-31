@@ -6,8 +6,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.apache.logging.log4j.LogManager;
@@ -167,10 +165,9 @@ public class DataFactory {
 			
 			String sql = 
 			"INSERT INTO tbl_nasdaq_sec_listing ("
-			+ "symbol, name, exchange,market_category, test_issue,financial_status,round_lot_size,is_etf,next_shares,last_updated, cqs_symbol,nasdaq_symbol) "+
-			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+			+ "symbol, name, exchange,market_category, test_issue,financial_status,round_lot_size,is_etf,next_shares) VALUES (?,?,?,?,?,?,?,?,?)";
 			
-			Date dt = new Date(System.currentTimeMillis());
+			//Date dt = new Date(System.currentTimeMillis());
 			
 			ps=con.prepareStatement(sql);  
 			
@@ -186,9 +183,10 @@ public class DataFactory {
 				ps.setString(7, a[5]);	//round lot size
 				ps.setString(8, a[6]);	//is etf
 				ps.setString(9, a[7]);	//next shares
-				ps.setDate(10, dt);		//last updated
-				ps.setString(11, null);		//CQS symbol
-				ps.setString(12, null);		//NASDAQ symbol
+				//mysql inserts default current timestap
+				//ps.setDate(10, dt);		//last updated
+				//ps.setString(11, null);		//CQS symbol
+				//ps.setString(12, null);		//NASDAQ symbol
 				
 				r = ps.executeUpdate();
 				//lg.debug("inserted " + r + " record(s)");
@@ -237,10 +235,10 @@ public class DataFactory {
 
 			String sql = 
 			"INSERT INTO tbl_nasdaq_sec_listing ("
-			+ "symbol, name, exchange, market_category, test_issue,financial_status,round_lot_size,is_etf,next_shares,last_updated, cqs_symbol,nasdaq_symbol) "+
-			" VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+			+ "symbol, name, exchange, market_category, test_issue,financial_status,round_lot_size,is_etf,next_shares) "+
+			" VALUES (?,?,?,?,?,?,?,?,?)";
 			
-			Date dt = new Date(System.currentTimeMillis());
+			//Date dt = new Date(System.currentTimeMillis());
 			
 			PreparedStatement ps=con.prepareStatement(sql);  
 			
@@ -274,9 +272,9 @@ public class DataFactory {
 				ps.setString(7, a[5]);  //round lot size
 				ps.setString(8, a[4]); //ETF
 				ps.setString(9, null); //next shares
-				ps.setDate(10, dt);		//lst updated
-				ps.setString(11, a[2]); //CQS symbol
-				ps.setString(12, a[7]); //NASDAQ symbol
+				//ps.setDate(10, dt);		//lst updated
+				//ps.setString(11, a[2]); //CQS symbol
+				//ps.setString(12, a[7]); //NASDAQ symbol
 				
 				r = ps.executeUpdate();
 				//lg.debug("inserted " + r + " record(s)");

@@ -110,7 +110,7 @@ public enum Globals {
 	YAH_HISTORIC_PERFORM_PERC_CHANGE_52W_LOW
 	;
 	
-
+	public static final int NA = -999;
 
 	
 	private static double accountTotal		= 10000.00;

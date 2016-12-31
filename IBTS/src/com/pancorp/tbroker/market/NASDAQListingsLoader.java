@@ -20,17 +20,16 @@ public class NASDAQListingsLoader {
 	
 	}
 	
-	private static Properties init(String cfgFile) throws FileNotFoundException, Exception {
+	private Properties init(String cfgFile) throws FileNotFoundException, Exception {
 		Properties pp = new Properties();
 		pp.load(new FileInputStream(cfgFile));
 		
 		return pp;
 	}
-
-	public static void main(String[] args) {
-		
+	
+	public void invoke(String cfgFile){
 		try {
-			String cfgFile = args[0];
+			//String cfgFile = args[0];
 			//String cfgFile = "/Users/pankstep/run/TBroker/cfg/ftp.nasdaqlist.properties";
 			FTPFileLoader ftp = new FTPFileLoader();
 			Properties cfg = init(cfgFile);
@@ -55,6 +54,12 @@ public class NASDAQListingsLoader {
 			Utils.logError(lg, e);
 			System.exit(1);
 		}
+	}
+
+	public static void main(String[] args) {
+		NASDAQListingsLoader nll = new NASDAQListingsLoader();
+		nll.invoke(args[0]);
+		
 	}
 
 }
