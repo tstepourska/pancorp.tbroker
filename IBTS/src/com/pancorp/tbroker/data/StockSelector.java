@@ -1,9 +1,21 @@
 package com.pancorp.tbroker.data;
 
+import com.pancorp.tbroker.util.Globals;
+
 public class StockSelector {
 
+	//Selection for trade following
 	//high volume  <2,000,000 per day
 	//large day range > 
+	//returns about 14 distinct rows
+	String sql = "SELECT run_update_date_time, symbol, exchange, (TRADE_DATA_DAY_HIGH-TRADE_DATA_DAY_LOW)/TRADE_DATA_DAY_HIGH AS PERC_DAY_RANGE "+
+				"FROM tbl_yahoo_market_data WHERE "+
+				"run_update_date_time IN (SELECT MAX(run_update_date_time) FROM tbl_yahoo_market_data) "+ 
+				"AND TRADE_DATA_AVG_DAY_VOLUME > "+ Globals.AVG_DAY_VOLUME + 
+				" AND TRADE_DATA_PREVIOUS_CLOSE > "+ Globals.PRICE_PREV_CLOSE_MIN + 
+				" AND TRADE_DATA_PREVIOUS_CLOSE < "+ Globals.PRICE_PREV_CLOSE_MAX + 
+				" AND (TRADE_DATA_DAY_HIGH-TRADE_DATA_DAY_LOW)/TRADE_DATA_DAY_HIGH > "+ Globals.PRICE_DAY_RANGE_PERC_MIN + 
+				" ORDER BY PERC_DAY_RANGE DESC";
 	
 	//for reversal stock candidate (trend fading category of strategies)
 	
@@ -15,4 +27,6 @@ public class StockSelector {
 	// 5) Look to buy the first candle that begins to reverse with a stop 
 	//    either at the high / low or minus 20 cents
 	// 6) Use trailing stops to keep in winning trade as long as possible
+	
+	
 }

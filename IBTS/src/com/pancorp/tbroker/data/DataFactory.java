@@ -27,9 +27,9 @@ public class DataFactory {
 			"TRADE_DATA_DAY_HIGH,TRADE_DATA_DAY_LOW,TRADE_DATA_VOLUME,TRADE_DATA_AVG_DAY_VOLUME,"+
 			"TRADE_DATA_PREVIOUS_CLOSE,HISTORIC_PERFORM_52W_HIGH,HISTORIC_PERFORM_52W_LOW,"+
 			"HISTORIC_PERFORM_CHANGE_FR52W_HIGH,HISTORIC_PERFORM_CHANGE_FR52W_LOW,HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH,"+
-			"HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			"HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW,RUN_UPDATE_DATE_TIME) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 	
-	public static int insertMarketDataRecord(YahooMarketDataRecord r){
+/*	public static int insertMarketDataRecord(YahooMarketDataRecord r){
 		int result = 0;
 		
 		
@@ -41,33 +41,31 @@ public class DataFactory {
 			con=DriverManager.getConnection(db_url,db_user,db_password);  
 			ps = con.prepareStatement(sqlInsertYahMarketData);
 			
-			ps.setString(1,r.getTicker());					//symbol String 1-14 chars
-			ps.setString(2, r.getExchange());               //exchange
-			ps.setDouble(3,r.getYAH_TRADE_DATA_ASK());		//TRADE_DATA_ASK double,
-			ps.setDouble(4,r.getYAH_TRADE_DATA_BID());		//TRADE_DATA_BID double,
-			ps.setInt(5,r.getYAH_TRADE_DATA_ASK_SIZE()); 	//TRADE_DATA_ASK_SIZE int, 
-			ps.setInt(6,r.getYAH_TRADE_DATA_BID_SIZE());	//TRADE_DATA_BID_SIZE int,
-			
-			ps.setTimestamp(7,r.getLast_trade_date_time());	//TRADE_DATA_LAST_TRADE_DATE_TIME Timestamp,
-			
-			ps.setDouble(8,r.getYAH_TRADE_DATA_LAST_TRADE_PRICE());		//TRADE_DATA_LAST_TRADE_PRICE double,
-			ps.setInt(9,r.getYAH_TRADE_DATA_LAST_TRADE_SIZE());			//TRADE_DATA_LAST_TRADE_SIZE int,
-			ps.setDouble(10,r.getYAH_TRADE_DATA_CHANGE());				//TRADE_DATA_CHANGE double,
-			ps.setDouble(11,r.getYAH_TRADE_DATA_CHANGE_PERCENT());		//TRADE_DATA_CHANGE_PERCENT double,
-			ps.setDouble(12,r.getYAH_TRADE_DATA_OPEN());				//TRADE_DATA_OPEN double,
-			ps.setDouble(13,r.getYAH_TRADE_DATA_DAY_HIGH());			//TRADE_DATA_DAY_HIGH double,
-			ps.setDouble(14,r.getYAH_TRADE_DATA_DAY_LOW());				//TRADE_DATA_DAY_LOW double,
-			ps.setInt(15,r.getYAH_TRADE_DATA_VOLUME());					//TRADE_DATA_VOLUME double,
-			ps.setInt(16,r.getYAH_TRADE_DATA_AVG_DAY_VOLUME());			//TRADE_DATA_AVG_DAY_VOLUME double,
-			ps.setDouble(17,r.getYAH_TRADE_DATA_PREVIOUS_CLOSE());		//TRADE_DATA_PREVIOUS_CLOSE double,
+			ps.setString	(1, r.getTicker());					//symbol String 1-14 chars
+			ps.setString	(2, r.getExchange());               //exchange
+			ps.setDouble	(3, r.getYAH_TRADE_DATA_ASK());		//TRADE_DATA_ASK double,
+			ps.setDouble	(4, r.getYAH_TRADE_DATA_BID());		//TRADE_DATA_BID double,
+			ps.setInt		(5, r.getYAH_TRADE_DATA_ASK_SIZE()); 	//TRADE_DATA_ASK_SIZE int, 
+			ps.setInt		(6, r.getYAH_TRADE_DATA_BID_SIZE());	//TRADE_DATA_BID_SIZE int,			
+			ps.setTimestamp	(7, r.getLast_trade_date_time());	//TRADE_DATA_LAST_TRADE_DATE_TIME Timestamp,		
+			ps.setDouble	(8, r.getYAH_TRADE_DATA_LAST_TRADE_PRICE());		//TRADE_DATA_LAST_TRADE_PRICE double,
+			ps.setInt		(9, r.getYAH_TRADE_DATA_LAST_TRADE_SIZE());			//TRADE_DATA_LAST_TRADE_SIZE int,
+			ps.setDouble	(10,r.getYAH_TRADE_DATA_CHANGE());				//TRADE_DATA_CHANGE double,
+			ps.setDouble	(11,r.getYAH_TRADE_DATA_CHANGE_PERCENT());		//TRADE_DATA_CHANGE_PERCENT double,
+			ps.setDouble	(12,r.getYAH_TRADE_DATA_OPEN());				//TRADE_DATA_OPEN double,
+			ps.setDouble	(13,r.getYAH_TRADE_DATA_DAY_HIGH());			//TRADE_DATA_DAY_HIGH double,
+			ps.setDouble	(14,r.getYAH_TRADE_DATA_DAY_LOW());				//TRADE_DATA_DAY_LOW double,
+			ps.setInt		(15,r.getYAH_TRADE_DATA_VOLUME());					//TRADE_DATA_VOLUME double,
+			ps.setInt		(16,r.getYAH_TRADE_DATA_AVG_DAY_VOLUME());			//TRADE_DATA_AVG_DAY_VOLUME double,
+			ps.setDouble	(17,r.getYAH_TRADE_DATA_PREVIOUS_CLOSE());		//TRADE_DATA_PREVIOUS_CLOSE double,
 			//ps.setDouble(17,r.getYAH_HISTORIC_PERFORM_52W_RANGE double,
-			ps.setDouble(18,r.getYAH_HISTORIC_PERFORM_52W_HIGH());		//HISTORIC_PERFORM_52W_HIGH double,
-			ps.setDouble(19,r.getYAH_HISTORIC_PERFORM_52W_LOW());		//HISTORIC_PERFORM_52W_LOW double,
-			ps.setDouble(20,r.getYAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH());	//HISTORIC_PERFORM_CHANGE_FROM_52HIGH double,
-			ps.setDouble(21,r.getYAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW());		//HISTORIC_PERFORM_CHANGE_FROM_52LOW double,
-			ps.setDouble(22,r.getYAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH());	//HISTORIC_PERFORM_PERC_CHANGE_52W_HIGH double,
-			ps.setDouble(23,r.getYAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW());	//HISTORIC_PERFORM_PERC_CHANGE_52W_LOWd double,
-			//ps.setTimestamp(23, new Timestamp(System.currentTimeMillis()));	//CREATED Timestamp	DEFAULT value goes here, no need to insert explicitely
+			ps.setDouble	(18,r.getYAH_HISTORIC_PERFORM_52W_HIGH());		//HISTORIC_PERFORM_52W_HIGH double,
+			ps.setDouble	(19,r.getYAH_HISTORIC_PERFORM_52W_LOW());		//HISTORIC_PERFORM_52W_LOW double,
+			ps.setDouble	(20,r.getYAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH());	//HISTORIC_PERFORM_CHANGE_FROM_52HIGH double,
+			ps.setDouble	(21,r.getYAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW());		//HISTORIC_PERFORM_CHANGE_FROM_52LOW double,
+			ps.setDouble	(22,r.getYAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH());	//HISTORIC_PERFORM_PERC_CHANGE_52W_HIGH double,
+			ps.setDouble	(23,r.getYAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW());	//HISTORIC_PERFORM_PERC_CHANGE_52W_LOWd double,
+			ps.setTimestamp	(24,r.getRunningLoadDateTime());	//RUN_UPDATE_DATE_TIME Timestamp	must be equal for all records inserted during  the same run
 			
 			result = ps.executeUpdate();
 			if(lg.isTraceEnabled())
@@ -90,7 +88,7 @@ public class DataFactory {
 		
 		return result;
 	}
-	
+	*/
 
 	public static LinkedList<String> getTickerList(){
 		LinkedList<String> results = null;

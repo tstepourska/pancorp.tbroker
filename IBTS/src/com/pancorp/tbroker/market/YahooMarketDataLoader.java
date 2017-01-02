@@ -103,17 +103,19 @@ public class YahooMarketDataLoader {
 	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(YahooMarketDataLoader.class);
 	
 	private LinkedList<String> tickers;
-	//private String tStamp;
+	private Timestamp tStamp;
 	LinkedList<String[]> tkrBuffer = null;
 	private ArrayList<String> emptyRecords = null;
 	private ArrayList<String> nullLines = null;
 	private ArrayList<String> notInserted = null;
 	private int loaded = 0;
+	YahooMarketDataRecord rec = null;
 	
 	public YahooMarketDataLoader() {
-		Timestamp ts = new Timestamp(System.currentTimeMillis());
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
+		//Timestamp ts = new Timestamp(System.currentTimeMillis());
+		//SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
 		//tStamp = df.format(ts);
+		rec = new YahooMarketDataRecord();
 		emptyRecords= new ArrayList<>();
 		nullLines= new ArrayList<>();
 		notInserted = new ArrayList<>();
@@ -128,6 +130,11 @@ public class YahooMarketDataLoader {
 				lg.debug("Found " + tickers.size() + " tickers");
 
 			tkrBuffer = new LinkedList<>();
+			
+			//date/time must be set here to make sure it is identical
+			//for all records inserted during this run
+			tStamp = new Timestamp(System.currentTimeMillis());
+			rec.setRunningLoadDateTime(tStamp);
 		
 			while(!this.tickers.isEmpty()){
 				//fill up the tkr buffer with max number of tickers
@@ -241,7 +248,7 @@ public class YahooMarketDataLoader {
 		boolean valid= false;
 		
 		try {
-			YahooMarketDataRecord rec = new YahooMarketDataRecord();
+			
 			url = new URL(u);
 			http = (HttpURLConnection)url.openConnection();
 			http.connect();

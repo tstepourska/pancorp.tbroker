@@ -111,6 +111,12 @@ public enum Globals {
 	;
 	
 	public static final int NA = -999;
+	
+	//1st level stock selection parameters (reduce list from thousands to under 20
+	public static long AVG_DAY_VOLUME					= 2000000;		// high liquidity
+	public static double PRICE_PREV_CLOSE_MIN			= 9.99;			// no penny stocks, reasonable amount to profit
+	public static double PRICE_PREV_CLOSE_MAX			= 100.00;		// max account capacity for 100 units
+	public static double PRICE_DAY_RANGE_PERC_MIN		= 0.049;		// high volatility
 
 	
 	private static double accountTotal		= 10000.00;

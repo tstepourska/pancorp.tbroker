@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import com.ibts.client.ContractDetails;
 import com.ibts.client.ScannerSubscription;
 import com.ibts.client.TagValue;
+import com.pancorp.tbroker.data.StockSelector;
 import com.pancorp.tbroker.market.MarketScannerWrapper;
 import com.pancorp.tbroker.market.NASDAQListingsLoader;
 import com.pancorp.tbroker.market.YahooMarketDataLoader;
@@ -32,6 +33,7 @@ public class MarketScannerMain {
 
 	public static void main(String[] args) {
 
+		//load latest list of available stocks
 		try {
 			String cfgFile = args[0];
 			NASDAQListingsLoader nll = new NASDAQListingsLoader();
@@ -41,6 +43,7 @@ public class MarketScannerMain {
 			System.exit(1);
 		}
 
+		//load latest market data for the list above
 		try {
 			YahooMarketDataLoader ydl = new YahooMarketDataLoader();
 			ydl.invoke();
@@ -48,6 +51,9 @@ public class MarketScannerMain {
 			Utils.logError(lg, e);
 			System.exit(1);
 		}
+		
+		//1st level filter
+		StockSelector ss = new StockSelector();
 	}
 	/*
 	 * MarketScannerWrapper mWrapper = new MarketScannerWrapper();

@@ -19,32 +19,37 @@ public class YahooMarketDataRecord {
 	private String ticker;
 	private String exchange;
 	
-	double YAH_TRADE_DATA_ASK;								
-	double YAH_TRADE_DATA_BID;								
-	int YAH_TRADE_DATA_ASK_SIZE;						
-	int YAH_TRADE_DATA_BID_SIZE;						
-	String YAH_TRADE_DATA_LAST_TRADE_DATE;					
-	String YAH_TRADE_DATA_LAST_TRADE_TIME;				
-	double YAH_TRADE_DATA_LAST_TRADE_PRICE;				
-	int YAH_TRADE_DATA_LAST_TRADE_SIZE;			
-	double YAH_TRADE_DATA_CHANGE;					
-	double YAH_TRADE_DATA_CHANGE_PERCENT;				
-	double YAH_TRADE_DATA_OPEN;
-	double YAH_TRADE_DATA_DAY_HIGH;
-	double YAH_TRADE_DATA_DAY_LOW;
+	private double YAH_TRADE_DATA_ASK;								
+	private double YAH_TRADE_DATA_BID;								
+	private int YAH_TRADE_DATA_ASK_SIZE;						
+	private int YAH_TRADE_DATA_BID_SIZE;						
+	private String YAH_TRADE_DATA_LAST_TRADE_DATE;					
+	private String YAH_TRADE_DATA_LAST_TRADE_TIME;				
+	private double YAH_TRADE_DATA_LAST_TRADE_PRICE;				
+	private int YAH_TRADE_DATA_LAST_TRADE_SIZE;			
+	private double YAH_TRADE_DATA_CHANGE;					
+	private double YAH_TRADE_DATA_CHANGE_PERCENT;				
+	private double YAH_TRADE_DATA_OPEN;
+	private double YAH_TRADE_DATA_DAY_HIGH;
+	private double YAH_TRADE_DATA_DAY_LOW;
 	///String YAH_TRADE_DATA_DAY_RANGE;
-	int YAH_TRADE_DATA_VOLUME;
-	int YAH_TRADE_DATA_AVG_DAY_VOLUME;
-	double YAH_TRADE_DATA_PREVIOUS_CLOSE;
+	private int YAH_TRADE_DATA_VOLUME;
+	private int YAH_TRADE_DATA_AVG_DAY_VOLUME;
+	private double YAH_TRADE_DATA_PREVIOUS_CLOSE;
 	//String YAH_HISTORIC_PERFORM_52W_RANGE;
-	double YAH_HISTORIC_PERFORM_52W_HIGH;
-	double YAH_HISTORIC_PERFORM_52W_LOW;
-	double YAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH;
-	double YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW;
-	double YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH;
-	double YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW;
+	private double YAH_HISTORIC_PERFORM_52W_HIGH;
+	private double YAH_HISTORIC_PERFORM_52W_LOW;
+	private double YAH_HISTORIC_PERFORM_CHANGE_FR52W_HIGH;
+	private double YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW;
+	private double YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH;
+	private double YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW;
 	//java.sql.Date last_trade_date_time;
-	java.sql.Timestamp last_trade_date_time;
+	private java.sql.Timestamp last_trade_date_time;
+	
+	//approximate time stamp of the running update
+	//used for quering by the latest date/time 
+	//to select symbols from latest update batch
+	private java.sql.Timestamp runningLoadDateTime;
 	
 	public YahooMarketDataRecord(String tkr, String rec, String ex) throws Exception {	
 		this.ticker = tkr;
@@ -398,6 +403,7 @@ public class YahooMarketDataRecord {
 		ps.setDouble(21,YAH_HISTORIC_PERFORM_CHANGE_FR52W_LOW);		//HISTORIC_PERFORM_CHANGE_FROM_52LOW double,
 		ps.setDouble(22,YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_HIGH);	//HISTORIC_PERFORM_PERC_CHANGE_52W_HIGH double,
 		ps.setDouble(23,YAH_HISTORIC_PERFORM_PERC_CHANGE_FR52W_LOW);	//HISTORIC_PERFORM_PERC_CHANGE_52W_LOWd double,
+		ps.setTimestamp(24, this.runningLoadDateTime);
 	}
 
 	public String getRecord() {
@@ -629,6 +635,12 @@ public class YahooMarketDataRecord {
 		this.exchange = exchange;
 	}
 
+	public java.sql.Timestamp getRunningLoadDateTime() {
+		return runningLoadDateTime;
+	}
+	public void setRunningLoadDateTime(java.sql.Timestamp runningLoadDateTime) {
+		this.runningLoadDateTime = runningLoadDateTime;
+	}
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb

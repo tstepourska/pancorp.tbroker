@@ -90,7 +90,6 @@ public class StrategyIntradayLong extends StrategyAbstract {
 	 */
 	public boolean queryEnter() throws Exception{
 		boolean buy = false;
-		// 1-minute timeframe to check for exit conditions
 		
 		return buy;
 	}
