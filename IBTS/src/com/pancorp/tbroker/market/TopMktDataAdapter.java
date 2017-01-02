@@ -2,9 +2,9 @@ package com.pancorp.tbroker.market;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.ibts.controller.NewTickType;
-import com.ibts.controller.ApiController.ITopMktDataHandler;
-import com.ibts.controller.Types.MktDataType;
+import com.ib.controller.NewTickType;
+import com.ib.controller.ApiController.ITopMktDataHandler;
+import com.ib.controller.Types.MktDataType;
 
 public class TopMktDataAdapter implements ITopMktDataHandler {
 	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(TopMktDataAdapter.class);

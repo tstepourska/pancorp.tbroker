@@ -1,7 +1,7 @@
 package com.pancorp.tbroker.market;
 
-import com.ibts.controller.NewTickType;
-import com.ibts.controller.Types.MktDataType;
+import com.ib.controller.NewTickType;
+import com.ib.controller.Types.MktDataType;
 
 public interface ITopMktDataHandler {
 	void tickPrice(NewTickType tickType, double price, int canAutoExecute);

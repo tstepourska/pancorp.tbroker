@@ -3,15 +3,13 @@ package com.pancorp.tbroker.main;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
-import com.ibts.client.Contract;
-import com.ibts.controller.AccountSummaryTag;
-import com.ibts.controller.ApiController;
-import com.ibts.controller.ApiConnection.ILogger;
-import com.ibts.controller.ApiController.IAccountHandler;
-import com.ibts.controller.ApiController.IAccountSummaryHandler;
-import com.ibts.controller.ApiController.IConnectionHandler;
-
+import com.ib.client.Contract;
+import com.ib.controller.AccountSummaryTag;
+import com.ib.controller.ApiController;
+import com.ib.controller.ApiConnection.ILogger;
+import com.ib.controller.ApiController.IAccountHandler;
+import com.ib.controller.ApiController.IAccountSummaryHandler;
+import com.ib.controller.ApiController.IConnectionHandler;
 import com.pancorp.tbroker.data.DataAnalyzer;
 import com.pancorp.tbroker.strategy.IStrategy;
 import com.pancorp.tbroker.strategy.StrategyAbstract;

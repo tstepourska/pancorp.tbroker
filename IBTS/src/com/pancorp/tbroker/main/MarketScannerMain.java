@@ -4,16 +4,16 @@ import java.util.Vector;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.ibts.client.ContractDetails;
-import com.ibts.client.ScannerSubscription;
-import com.ibts.client.TagValue;
 import com.pancorp.tbroker.data.StockSelector;
 import com.pancorp.tbroker.market.MarketScannerWrapper;
 import com.pancorp.tbroker.market.NASDAQListingsLoader;
 import com.pancorp.tbroker.market.YahooMarketDataLoader;
 import com.pancorp.tbroker.util.Globals;
 import com.pancorp.tbroker.util.Utils;
-import com.ibts.controller.ScanCode;
+import com.ib.client.ContractDetails;
+import com.ib.client.ScannerSubscription;
+import com.ib.client.TagValue;
+import com.ib.controller.ScanCode;
 
 /**
  * Select all stocks from list of exchanges sorted by time zone offset

@@ -12,42 +12,23 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-/*
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
 
-
-import com.ibts.apidemo.util.HtmlButton;
-import com.ibts.apidemo.util.NewTabbedPanel;
-import com.ibts.apidemo.util.TCombo;
-import com.ibts.apidemo.util.UpperField;
-import com.ibts.apidemo.util.VerticalPanel;
-//import com.ibts.apidemo.util.NewTabbedPanel.NewTabPanel;
-import com.ibts.apidemo.util.VerticalPanel.StackPanel;
-*/
-import com.ibts.client.ScannerSubscription;
-import com.ibts.controller.Bar;
-import com.ibts.controller.Instrument;
-import com.ibts.controller.NewContract;
-import com.ibts.controller.NewContractDetails;
-import com.ibts.controller.ScanCode;
-import com.ibts.controller.ApiController.IDeepMktDataHandler;
-import com.ibts.controller.ApiController.IHistoricalDataHandler;
-import com.ibts.controller.ApiController.IRealTimeBarHandler;
-import com.ibts.controller.ApiController.IScannerHandler;
-import com.ibts.controller.Types.BarSize;
-import com.ibts.controller.Types.DeepSide;
-import com.ibts.controller.Types.DeepType;
-import com.ibts.controller.Types.DurationUnit;
-import com.ibts.controller.Types.MktDataType;
-import com.ibts.controller.Types.WhatToShow;
+import com.ib.client.ScannerSubscription;
+import com.ib.controller.Bar;
+import com.ib.controller.Instrument;
+import com.ib.controller.NewContract;
+import com.ib.controller.NewContractDetails;
+import com.ib.controller.ScanCode;
+import com.ib.controller.ApiController.IDeepMktDataHandler;
+import com.ib.controller.ApiController.IHistoricalDataHandler;
+import com.ib.controller.ApiController.IRealTimeBarHandler;
+import com.ib.controller.ApiController.IScannerHandler;
+import com.ib.controller.Types.BarSize;
+import com.ib.controller.Types.DeepSide;
+import com.ib.controller.Types.DeepType;
+import com.ib.controller.Types.DurationUnit;
+import com.ib.controller.Types.MktDataType;
+import com.ib.controller.Types.WhatToShow;
 import com.pancorp.tbroker.market.MarketTabbedObject.NewTab;
 import com.pancorp.tbroker.market.NewTabbedObject.NewTabPanel;
 
@@ -104,7 +85,7 @@ public class MarketDataObject //extends JPanel
 		}
 
 		void onReqType() {
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqMktDataType( m_typeCombo.getSelectedItem() );
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().reqMktDataType( m_typeCombo.getSelectedItem() );
 		}
 		
 		class TopTable //extends JTable 
@@ -129,7 +110,7 @@ public class MarketDataObject //extends JPanel
 
 			DeepResultsObject resultPanel = new DeepResultsObject();
 			//m_resultsPanel.addTab( "Deep " + m_contract.symbol(), resultPanel, true, true);
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqDeepMktData(m_contract, 6, resultPanel);
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().reqDeepMktData(m_contract, 6, resultPanel);
 		}
 	}
 
@@ -142,7 +123,7 @@ public class MarketDataObject //extends JPanel
 		}
 		
 		/*protected void onDesub() {
-			com.ibts.apidemo.ApiDemo.INSTANCE.controller().cancelDeepMktData( this);
+			com.ib.apidemo.ApiDemo.INSTANCE.controller().cancelDeepMktData( this);
 		}*/
 
 		/*@Override public void activated() {
@@ -150,7 +131,7 @@ public class MarketDataObject //extends JPanel
 
 		/** Called when the tab is closed by clicking the X. */
 		/*@Override public void closed() {
-			com.ibts.apidemo.ApiDemo.INSTANCE.controller().cancelDeepMktData( this);
+			com.ib.apidemo.ApiDemo.INSTANCE.controller().cancelDeepMktData( this);
 		}*/
 		
 		@Override public void updateMktDepth(int pos, String mm, DeepType operation, DeepSide side, double price, int size) {
@@ -259,7 +240,7 @@ public class MarketDataObject //extends JPanel
 		protected void onHistorical() {
 	
 			BarResultsObject panel = new BarResultsObject(true);
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqHistoricalData(m_contract, m_end.getText(), m_duration.getInt(), m_durationUnit.getSelectedItem(), m_barSize.getSelectedItem(), m_whatToShow.getSelectedItem(), m_rthOnly.isSelected(), panel);
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().reqHistoricalData(m_contract, m_end.getText(), m_duration.getInt(), m_durationUnit.getSelectedItem(), m_barSize.getSelectedItem(), m_whatToShow.getSelectedItem(), m_rthOnly.isSelected(), panel);
 			//m_resultsPanel.addTab( "Historical " + m_contract.symbol(), panel, true, true);
 		}
 	}
@@ -274,7 +255,7 @@ public class MarketDataObject //extends JPanel
 		protected void onRealTime() {
 	
 			BarResultsObject panel = new BarResultsObject(false);
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqRealTimeBars(m_contract, m_whatToShow.getSelectedItem(), m_rthOnly.isSelected(), panel);
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().reqRealTimeBars(m_contract, m_whatToShow.getSelectedItem(), m_rthOnly.isSelected(), panel);
 			//m_resultsPanel.addTab( "Real-time " + m_contract.symbol(), panel, true, true);
 		}
 	}
@@ -295,10 +276,10 @@ public class MarketDataObject //extends JPanel
 		/** Called when the tab is closed by clicking the X. */
 		public void closed() {
 			if (m_historical) {
-				//com.ibts.apidemo.ApiDemo.INSTANCE.controller().cancelHistoricalData( this);
+				//com.ib.apidemo.ApiDemo.INSTANCE.controller().cancelHistoricalData( this);
 			}
 			else {
-				//com.ibts.apidemo.ApiDemo.INSTANCE.controller().cancelRealtimeBars( this);
+				//com.ib.apidemo.ApiDemo.INSTANCE.controller().cancelRealtimeBars( this);
 			}
 		}
 
@@ -389,7 +370,7 @@ public class MarketDataObject //extends JPanel
 			ScannerResultsPanel resultsPanel = new ScannerResultsPanel();
 			m_resultsPanel.addTab( sub.scanCode(), resultsPanel, true, true);
 
-			com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqScannerSubscription( sub, resultsPanel);
+			com.ib.apidemo.ApiDemo.INSTANCE.controller().reqScannerSubscription( sub, resultsPanel);
 			*/
 		}
 	}
@@ -408,7 +389,7 @@ public class MarketDataObject //extends JPanel
 
 		/** Called when the tab is closed by clicking the X. */
 		@Override public void closed() {
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().cancelScannerSubscription( this);
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().cancelScannerSubscription( this);
 			//m_model.desubscribe();
 		}
 

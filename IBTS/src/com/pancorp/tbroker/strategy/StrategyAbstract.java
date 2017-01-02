@@ -3,8 +3,8 @@ package com.pancorp.tbroker.strategy;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import com.ib.client.Contract;
 import com.pancorp.tbroker.condition.ICondition;
-import com.ibts.client.Contract;
 
 public abstract class StrategyAbstract extends Thread implements IStrategy {
 	

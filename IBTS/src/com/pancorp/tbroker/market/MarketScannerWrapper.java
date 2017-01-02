@@ -6,21 +6,21 @@ import java.util.Vector;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.ibts.client.AnyWrapper;
-import com.ibts.client.CommissionReport;
-import com.ibts.client.Contract;
-import com.ibts.client.ContractDetails;
-import com.ibts.client.EClientSocket;
-import com.ibts.client.EWrapper;
-import com.ibts.client.Execution;
-import com.ibts.client.Order;
-import com.ibts.client.OrderState;
-import com.ibts.client.ScannerSubscription;
-import com.ibts.client.TagValue;
-import com.ibts.client.UnderComp;
+import com.ib.client.AnyWrapper;
+import com.ib.client.CommissionReport;
+import com.ib.client.Contract;
+import com.ib.client.ContractDetails;
+import com.ib.client.EClientSocket;
+import com.ib.client.EWrapper;
+import com.ib.client.Execution;
+import com.ib.client.Order;
+import com.ib.client.OrderState;
+import com.ib.client.ScannerSubscription;
+import com.ib.client.TagValue;
+import com.ib.client.UnderComp;
 import com.pancorp.tbroker.util.Globals;
 
-public class MarketScannerWrapper implements com.ibts.client.EWrapper{// implements AnyWrapper{
+public class MarketScannerWrapper implements com.ib.client.EWrapper{// implements AnyWrapper{
 	
 	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(MarketScannerWrapper.class);
 			

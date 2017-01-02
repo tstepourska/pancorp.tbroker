@@ -5,16 +5,15 @@ import java.util.Collections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.ibts.client.EClientSocket;
-import com.ibts.client.TagValue;
-import com.ibts.controller.NewContract;
-import com.ibts.controller.ApiController.IBulletinHandler;
-//import com.ibts.controller.ApiController.ITimeHandler;
-import com.ibts.controller.ApiController.ITopMktDataHandler;
-import com.ibts.controller.Types.NewsType;
+import com.ib.client.EClientSocket;
+import com.ib.client.TagValue;
+import com.ib.controller.NewContract;
+import com.ib.controller.ApiController.IBulletinHandler;
+import com.ib.controller.ApiController.ITopMktDataHandler;
+import com.ib.controller.Types.NewsType;
 
-//import com.ibts.controller.ApiConnection.ILogger;
-//import com.ibts.controller.ApiController;
+//import com.ib.controller.ApiConnection.ILogger;
+//import com.ib.controller.ApiController;
 
 public class TWrapper extends SimpleWrapper
 //ApiController 

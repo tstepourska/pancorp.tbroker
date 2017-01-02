@@ -4,7 +4,7 @@ package com.pancorp.tbroker.strategy.stock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.ibts.client.Contract;
+import com.ib.client.Contract;
 import com.pancorp.tbroker.strategy.StrategyAbstract;
 import com.pancorp.tbroker.util.Utils;
 

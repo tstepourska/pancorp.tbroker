@@ -4,9 +4,9 @@ import java.util.Vector;
 
 import org.apache.logging.log4j.LogManager;
 
-import com.ibts.client.ScannerSubscription;
-import com.ibts.client.TagValue;
-import com.ibts.controller.ScanCode;
+import com.ib.client.ScannerSubscription;
+import com.ib.client.TagValue;
+import com.ib.controller.ScanCode;
 
 public class MarketScannerHandler {
 	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(MarketScannerHandler.class);

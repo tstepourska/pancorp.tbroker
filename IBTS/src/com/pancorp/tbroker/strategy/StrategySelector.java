@@ -1,6 +1,6 @@
 package com.pancorp.tbroker.strategy;
 
-import com.ibts.client.Contract;
+import com.ib.client.Contract;
 
 public class StrategySelector {
 	/**

@@ -16,17 +16,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import com.ibts.apidemo.util.HtmlButton;
-import com.ibts.apidemo.util.NewTabbedPanel;
-import com.ibts.apidemo.util.NewTabbedPanel.INewTab;
-import com.ibts.apidemo.util.TCombo;
-import com.ibts.apidemo.util.VerticalPanel;
-
-import com.ibts.controller.ApiController.IContractDetailsHandler;
-import com.ibts.controller.ApiController.IFundamentalsHandler;
-import com.ibts.controller.NewContract;
-import com.ibts.controller.NewContractDetails;
-import com.ibts.controller.Types.FundamentalType;
+import com.ib.apidemo.util.HtmlButton;
+import com.ib.apidemo.util.NewTabbedPanel;
+import com.ib.apidemo.util.TCombo;
+import com.ib.apidemo.util.VerticalPanel;
+import com.ib.apidemo.util.NewTabbedPanel.INewTab;
+import com.ib.controller.NewContract;
+import com.ib.controller.NewContractDetails;
+import com.ib.controller.ApiController.IContractDetailsHandler;
+import com.ib.controller.ApiController.IFundamentalsHandler;
+import com.ib.controller.Types.FundamentalType;
 
 public class ContractInfoObject
 {
@@ -57,7 +56,7 @@ public class ContractInfoObject
 			
 			DetailsResultsObject panel = new DetailsResultsObject();
 			//m_resultsPanels.addTab( m_contract.symbol() + " " + "Description", panel, true, true);
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqContractDetails(m_contract, panel);
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().reqContractDetails(m_contract, panel);
 		}
 	}
 
@@ -104,7 +103,7 @@ public class ContractInfoObject
 			FundaResultObject panel = new FundaResultObject();
 			FundamentalType type = m_type.getSelectedItem();
 			//m_resultsPanels.addTab( m_contract.symbol() + " " + type, panel, true, true);
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqFundamentals( m_contract, type, panel); 
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().reqFundamentals( m_contract, type, panel); 
 		}
 	}	
 	
@@ -132,7 +131,7 @@ public class ContractInfoObject
 
 		/** Called when the tab is first visited. */
 		@Override public void activated() {
-			//com.ibts.apidemo.ApiDemo.INSTANCE.controller().reqFundamentals(m_contract, FundamentalType.ReportRatios, this);
+			//com.ib.apidemo.ApiDemo.INSTANCE.controller().reqFundamentals(m_contract, FundamentalType.ReportRatios, this);
 		}
 		
 		/** Called when the tab is closed by clicking the X. */

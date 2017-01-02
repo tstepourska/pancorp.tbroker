@@ -2,7 +2,7 @@ package com.pancorp.tbroker.util;
 
 import org.apache.logging.log4j.Logger;
 
-import com.ibts.controller.ApiConnection.ILogger;
+import com.ib.controller.ApiConnection.ILogger;
 
 public class __TLogger implements ILogger{
 	private Logger lg;
