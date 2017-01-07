@@ -6,22 +6,28 @@ import java.util.Queue;
 import java.util.Stack;
 
 import com.ib.client.Contract;
+import com.pancorp.tbroker.event.TBrokerEvent;
 import com.pancorp.tbroker.model.Candle;
+import com.pancorp.tbroker.model.PatternLibrary;
+import com.pancorp.tbroker.model.TrendCache;
 
 public class DataAnalyzer {
-	Stack<Candle> stack;
+	LinkedList<Candle> pattern;
+	TrendCache trend;
 	
 	public Contract invoke(){
 		Contract c = new Contract();
 		Candle candle;
 		boolean working = true;
+		TBrokerEvent e = null;
 		//get all data 
 		//select instrument - future, stock, forex
 		
 		//HashMap<String,Stack<Candle>> map = new HashMap<>();
 		
-		stack =  new Stack<>();
+		list =  new LinkedList<>();
 		
+		loop:
 		while(working){
 		// 15-minute timeframe to help determine the trend throughout the duration of the trade
 		 long time=0;
@@ -33,8 +39,27 @@ public class DataAnalyzer {
 		 long volume=0; 
 		 int count = 0;
 		candle = new Candle(time, high, low,open, close, wap, volume, count);
-		String pattern = candle.getSimplePattern();
-		checkPattern(pattern);
+		
+		e =  PatternLibrary.matchPattern(list, candle);
+		//TODO what patterns to save for monitoring
+		switch(e.getAction()){
+		case BUY:
+			
+			break;
+		case CANCEL:
+			break;
+		case NONE:
+			break;
+		case ADD_TO_MONITOR:
+			list.add(candle);
+			break;
+		case SELL:
+			break;
+		default:
+			break;
+		
+		}
+		
 		
 		//in.setTicker("IBM");
 		//in.setType(InstrumentTypes.getValue( InstrumentTypes.STOCK));
@@ -46,13 +71,6 @@ public class DataAnalyzer {
 		}
 		
 		return c;
-	}
-	
-	private boolean checkPattern(String p){
-		boolean save = false;
-		//TODO what patterns to save for monitoring
-		
-		return save;
 	}
 
 }

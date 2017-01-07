@@ -37,6 +37,20 @@ public class Bar {
 		m_volume = volume;
 		m_count = count;
 	}
+	
+	/**
+	 * Added by TS for extending proxy Candle
+	 */
+	/*public Bar(){
+		m_time =0;
+		m_high = 0;
+		m_low = 0;
+		m_open = 0;
+		m_close= 0;
+		m_wap = 0;
+		m_volume = 0;
+		m_count = 0;
+	}*/
 
 	public String formattedTime() {
 		return Formats.fmtDate( m_time * 1000);

@@ -1,6 +1,8 @@
 package com.pancorp.tbroker.model;
 
-public enum CandlePattern {
+public enum CandlePatternEnum {
+	
+	//simple: single candle patterns
 	DOJI,				//no body (or within few pennies, either direction), short or avg shadows
 	TOMBSTONE_DOJI,		//foji, long top shadow, no bottom
 	DRAGONFLY_DOJI,		//foji, long lower shadow, no top
@@ -39,7 +41,7 @@ public enum CandlePattern {
 	FALLING_THREE,
 	;
 	
-	public static String getValue(CandlePattern p){
+	public static String getValue(CandlePatternEnum p){
 		switch(p){
 		case DOJI:
 			return "doji";

@@ -45,7 +45,7 @@ public class Candle extends Bar {
 	/* TODO: define criteria for avg body */
 	
 	private int direction;
-	private String simplePattern;
+	private CandlePatternEnum simplePattern;
 	
 	/**
 	 * Constructor
@@ -55,8 +55,8 @@ public class Candle extends Bar {
 		calcDirection();
 		calcSimplePattern();
 	}
-	
-	public String getSimplePattern(){
+
+	public CandlePatternEnum getSimplePattern(){
 		return this.simplePattern;
 	}
 	
@@ -78,7 +78,7 @@ public class Candle extends Bar {
 		
 		//determine if the candlestick is Doji and which one
 		if(dBody<=deviationYesOrNo){			
-			simplePattern = CandlePattern.getValue(CandlePattern.DOJI);
+			simplePattern = CandlePatternEnum.DOJI;
 			
 			//equal or above this range (for both legs) legs are considered long
 			double longLegThreshold = open*DOJI_LONG_THRESHOLD_PERC;
@@ -87,19 +87,19 @@ public class Candle extends Bar {
 			switch(direction){
 				case WHITE:
 					if(high==close&&low<open && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePattern.getValue(CandlePattern.DRAGONFLY_DOJI);
+						simplePattern = CandlePatternEnum.DRAGONFLY_DOJI;
 					else if(high>close && low==open && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePattern.getValue(CandlePattern.TOMBSTONE_DOJI);
+						simplePattern = CandlePatternEnum.TOMBSTONE_DOJI;
 					else if(high>close && low<open && dShadows > longLegThreshold) //check length of 2 legs together
-						simplePattern = CandlePattern.getValue(CandlePattern.LONG_LEGGED_DOJI);
+						simplePattern = CandlePatternEnum.LONG_LEGGED_DOJI;
 						break;
 				case BLACK:
 					if(high==open&&low<close && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePattern.getValue(CandlePattern.DRAGONFLY_DOJI);
+						simplePattern = CandlePatternEnum.DRAGONFLY_DOJI;
 					else if(high>open && low==open && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePattern.getValue(CandlePattern.TOMBSTONE_DOJI);
+						simplePattern = CandlePatternEnum.TOMBSTONE_DOJI;
 					else if(high>open && low<close && dShadows > longLegThreshold)  //check length of 2 legs together
-						simplePattern = CandlePattern.getValue(CandlePattern.LONG_LEGGED_DOJI);
+						simplePattern = CandlePatternEnum.LONG_LEGGED_DOJI;
 					break;
 				default:
 			}
@@ -113,19 +113,19 @@ public class Candle extends Bar {
 		if(direction==WHITE){	//white 
 			if(longBody){
 				if((open ==low || Math.abs(open-low) < deviationYesOrNo)&&close==high || Math.abs(high-close)<deviationYesOrNo)	
-					                                                                                                          simplePattern = CandlePattern.getValue(CandlePattern.BULLISH_MARABOZU);
+					 simplePattern = CandlePatternEnum.BULLISH_MARABOZU;
 			}
 			else{	//short or average body
 				if(low==open || Math.abs(open-low)<deviationYesOrNo){	//no lower shadow
 					if(Math.abs(high-close) > open*DOJI_LONG_THRESHOLD_PERC)	//upper shadow is longer than average
-						simplePattern = CandlePattern.getValue(CandlePattern.LONG_UPPER_SHADOW);
+						simplePattern = CandlePatternEnum.LONG_UPPER_SHADOW;
 				}
 				else {	//both shadows
 					if(shortBody){
 						if(open-low>open*DOJI_LONG_THRESHOLD_PERC && high-close > open*DOJI_LONG_THRESHOLD_PERC)	//both shadows are long
-							simplePattern = CandlePattern.getValue(CandlePattern.HIGH_WAVE);
+							simplePattern = CandlePatternEnum.HIGH_WAVE;
 						else 
-							simplePattern = CandlePattern.getValue(CandlePattern.SPINNING_TOP);
+							simplePattern = CandlePatternEnum.SPINNING_TOP;
 					}
 				}
 			}
@@ -133,19 +133,19 @@ public class Candle extends Bar {
 		else if(direction==BLACK){ 	//black
 			if(longBody){
 				if((open ==high || Math.abs(open-high) < deviationYesOrNo)&& close==low || Math.abs(close-low)<deviationYesOrNo)	
-					simplePattern = CandlePattern.getValue(CandlePattern.BEARISH_MARABOZU);
+					simplePattern = CandlePatternEnum.BEARISH_MARABOZU;
 			}
 			else{	//short or average body
 				if(high==open|| Math.abs(high-open)<deviationYesOrNo){	//no upper shadow
 					if(Math.abs(close -low)> open*DOJI_LONG_THRESHOLD_PERC)	//lower shadow is longer than average
-						simplePattern = CandlePattern.getValue(CandlePattern.LONG_LOWER_SHADOW);
+						simplePattern = CandlePatternEnum.LONG_LOWER_SHADOW;
 				}
 				else {	//both shadows
 					if(shortBody){
 						if(high-open > open*DOJI_LONG_THRESHOLD_PERC && (close-low)> open*DOJI_LONG_THRESHOLD_PERC)		//both shadows are long
-							simplePattern = CandlePattern.getValue(CandlePattern.HIGH_WAVE);
+							simplePattern = CandlePatternEnum.HIGH_WAVE;
 						else 
-							simplePattern = CandlePattern.getValue(CandlePattern.SPINNING_TOP);
+							simplePattern = CandlePatternEnum.SPINNING_TOP;
 					}
 				}
 			}

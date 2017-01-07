@@ -20,6 +20,7 @@ import com.ib.controller.NewTickType;
 import com.ib.controller.OrderType;
 import com.ib.controller.Types;
 import com.ib.controller.ApiConnection.ILogger;
+import com.ib.controller.ApiController.IAccountHandler;
 import com.ib.controller.ApiController.IConnectionHandler;
 import com.ib.controller.ApiController.IContractDetailsHandler;
 import com.ib.controller.ApiController.IDeepMktDataHandler;
@@ -39,8 +40,10 @@ import com.pancorp.tbroker.market.ITopMktDataHandler;
 import com.pancorp.tbroker.market.MarketDataObject;
 import com.pancorp.tbroker.market.MarketDataObject.BarResultsObject;
 import com.pancorp.tbroker.market.MarketDataObject.ScannerResultsObject;
+import com.pancorp.tbroker.handler.AccountHandler;
 import com.pancorp.tbroker.market.ContractInfoObject.DetailsResultsObject;
 import com.pancorp.tbroker.market.TopMktDataAdapter;
+import com.pancorp.tbroker.handler.OrderHandler;
 import com.pancorp.tbroker.util.Globals;
 
 public class TBrokerApi implements IConnectionHandler 
@@ -108,7 +111,7 @@ public class TBrokerApi implements IConnectionHandler
 		//request historical data
 		int tickerId = 1;
 		Contract ctrct = new Contract();
-		ctrct.m_exchange = "ISLAND";
+		ctrct.m_exchange = "SMART" ; //"ISLAND";
 		//ctrct.m_symbol("IBM");
 		String endDateTime = "20161224 11:30:25 EST"; //yyyymmdd hh:mm:ss tmz
 		//int formatDate - client: 1 -- dates applying to bars returned in the format: yyyymmdd{space}{space}hh:mm:dd
@@ -152,18 +155,84 @@ public class TBrokerApi implements IConnectionHandler
 		*/
 		
 		//placing an order
+		//EClient method:
+		// public synchronized void placeOrder(NewContract contract, NewOrder order)
 		NewOrder order = new NewOrder();
+		int orderId = 1;
 		String v = "AccountNumber";
 		order.account(v);
 		order.action(Action.BUY);
 		int clientId = 1;
 		order.totalQuantity(100);
 		order.clientId(clientId);
-		order.orderId(1);
+		order.orderId(orderId);
 		order.orderType(OrderType.LMT);
 		order.lmtPrice(35.37D);
-		//IOrderHandler h7 = new IOrderHandler();
-		//wrapper.placeOrModifyOrder(contract, order, h7);
+		IOrderHandler h7 = new OrderHandler();
+		wrapper.placeOrModifyOrder(contract, order, h7);
+		
+		//cancel order:
+		wrapper.cancelOrder(orderId);
+		
+		/*
+		 * m_algoStrategy, which contains the actual name of the IB Algo order type (called a “strategy,” 
+		 * 					some of these include AD for Accumulate/Distribute, PctVol for Percentage of Volume, and so on).
+		 * 
+		 * m_algoParams, which is essentially a container for IB Algo order parameters and their values in the form:
+		 * 
+		 * m_algoParams.add( new TagValue("maxPctVol","0.01") );
+		 * 
+		 * Parameter		Description						Syntax
+		 * ----------------------------------------------------------------------------
+		 * maxPctVol		Maximum percentage	range: 		“0.01” – “0.5”
+		 * riskAversion		Urgency/Risk aversion			“Get Done”, “Aggressive”, “Neutral”, “Passive”
+		 * startTime		Start time						“9:00:00 EST”
+		 * endTime			End time						“15:00:00 EST”
+		 * forceCompletion	Attempt completion by EOD		“0” or “1”
+		 * allowPastEndTime	Allow trading past end time		“0” or “1”
+		 * 
+		 * Accumulate Distribute Java Code Example
+		 * 
+		 * Contract m_contract = newContract();
+		 * Order m_order = newOrder();
+		 * Vector<TagValue>m_algoParams = new Vector<TagValue>();
+		 * 
+		 * // Stocks 
+		 * m_contract.m_symbol = "IBM";
+		 * m_contract.m_secType = "STK";
+		 * m_contract.m_exchange = "SMART";
+		 * m_contract.m_currency = "USD";
+		 * 
+		 * // Accumulate/Distribute (All) 
+		 * m_algoParams.add(newTagValue("componentSize", "100"));
+		 * m_algoParams.add(newTagValue("timeBetweenOrders", "60"));
+		 * m_algoParams.add(newTagValue("randomizeTime20", "1"));
+		 * m_algoParams.add(newTagValue("randomizeSize55", "1"));
+		 * m_algoParams.add(newTagValue("giveUp", "1"));
+		 * m_algoParams.add(newTagValue("catchUp", "1"));
+		 * m_algoParams.add(newTagValue("waitForFill", "1"));
+		 * m_algoParams.add(newTagValue("startTime", "20110302-14:30:00 GMT"));
+		 * m_algoParams.add(newTagValue("endTime", "20110302-21:00:00 GMT"));
+		 * 
+		 * m_order.m_action = "BUY";
+		 * m_order.m_totalQuantity = 700;
+		 * m_order.m_orderType = "LMT";
+		 * m_order.m_lmtPrice = 140.0;
+		 * m_order.m_algoStrategy = "AD";
+		 * m_order.m_tif = "DAY";
+		 * m_order.m_algoParams = m_algoParams;
+		 * m_order.m_transmit = false;
+		 * m_client.placeOrder(orderId++, m_contract, m_order);
+		 */
+		
+		
+		//account information
+		//EClient method:
+		// public synchronized void reqAccountUpdates(boolean subscribe, String acctCode)
+		boolean subscribe = true;
+		String acctCode = "DU12345";
+		IAccountHandler h8 = new AccountHandler();
+		wrapper.reqAccountUpdates(subscribe, acctCode, h8);
     }
 	
 	public void connected() {
