@@ -13,7 +13,9 @@ import com.pancorp.tbroker.util.Utils;
 import com.ib.client.ContractDetails;
 import com.ib.client.ScannerSubscription;
 import com.ib.client.TagValue;
+import com.ib.controller.Instrument;
 import com.ib.controller.ScanCode;
+import com.ib.controller.Types;
 
 /**
  * Select all stocks from list of exchanges sorted by time zone offset
@@ -55,19 +57,38 @@ public class MarketScannerMain {
 		//1st level filter
 		StockSelector ss = new StockSelector();
 	}
-	/*
-	 * MarketScannerWrapper mWrapper = new MarketScannerWrapper();
-	 * 
-	 * if(!mWrapper.isConnected()) mWrapper.disconnect();
-	 * 
-	 * mWrapper.connect(Globals.host, Globals.port, Globals.clientId);
-	 * 
-	 * if(!mWrapper.isConnected()){ lg.error(
-	 * "Connection attempt failed. Exiting.."); System.exit(1); }
-	 * 
-	 * mWrapper.reqScannerParameters(); lg.trace(
-	 * "Called mWrapper.reqScannerParameters");
-	 */
+	
+	public void subscribeToIBMS(){
+		
+	 MarketScannerWrapper mWrapper = new MarketScannerWrapper();
+	 
+	 if(!mWrapper.isConnected()) mWrapper.disconnect();
+	 
+	 mWrapper.connect(Globals.host, Globals.port, Globals.clientId);
+	 
+	 if(!mWrapper.isConnected()){ 
+		 lg.error("Connection attempt failed. Exiting.."); 
+		 System.exit(1); 
+	}
+	 
+	 mWrapper.reqScannerParameters(); 
+	 lg.trace("Called mWrapper.reqScannerParameters");
+	 
+	 ScannerSubscription sub = new ScannerSubscription();
+	 sub.abovePrice(10.00);
+	 sub.belowPrice(100.00);
+	 sub.aboveVolume(2000000);
+	 sub.instrument("STK");//STK,OPT, FUT, IND, FOP, CASH, BAG, NEWS
+	 sub.stockTypeFilter("CORP");
+	 sub.scanCode("TOP_PRICE_RANGE"); // TOP_OPEN_PERC_GAIN,TOP_OPEN_PERC_LOSE,
+	 sub.locationCode("STK.NASDAQ.NMS,STK.NASDAQ.SCM,STK.NASDAQ,STK.NYSE");  //STK.US.MAJOR, STK.US.MINOR, STK.US,STK.AMEX,STK.ARCA,
+	 //sub.scannerSettingPairs("Annual,true"); //on top of scan code 
+	 
+	 int tickerId = 731;
+	 Vector<TagValue> scannerSubscriptionOptions = new Vector<>();
+	 
+	 mWrapper.reqScannerSubscription(tickerId, sub, scannerSubscriptionOptions);
+	 
 	// wrapper callback method 'reqScannerParameters(String xml)' will feed the
 	// info into the pipe
 	// then triggers event handling which calls reqDataSubscription based on
@@ -85,6 +106,6 @@ public class MarketScannerMain {
 	 * ApiController c = new ApiController(handler, inLogger, outLogger);
 	 */
 
-	// }
+	}
 
 }
