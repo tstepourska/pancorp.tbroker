@@ -1,17 +1,13 @@
 /**
- * 
+ * Copyright 2016-2017 PanCorp Group
  */
 package com.pancorp.tbroker.model;
 
 import com.ib.controller.Bar;
+import com.pancorp.tbroker.util.Constants;
 
 /**
- * For the definition of Doji:
  * 
- *  Point is the smallest possible price change on the left side of the decimal point. ($1 ?)
- *  
- *  1/8 point for $20 stock: 0.00630517*100%
- *  1 1/4 point for $200 stock: 0.00625*100%
  */
 
 /**
@@ -19,139 +15,36 @@ import com.ib.controller.Bar;
  *
  */
 public class Candle extends Bar {
-
-	/** Values for candlestick direction */
-	public static final int BLACK = -1;
-	public static final int WHITE = 1;
-	public static final int DOJI = 0;
 	
-	//public static enum SinglePattern {DOJI,MARABOZU};
+	//public enum LENGTH_TYPE  {LONG, SHORT, AVERAGE};
 	
-	/**
-	 * Percent from the open price that allowed for Doji pattern (considered the same)
-	 */
-	public static final double DOJI_BODY_RANGE_PERC = 0.005;
-	//public static final double _DOJI_LEG_RANGE_PERC = 0.01;
-	
-	/**
-	 * Percent of [open] price above which leg or body is considered long, 
-	 * below is average
-	 * //TODO: recalculate and reload based on previous average candle values;
-	 * 2-3 times below avg - short, 2-3 times above avg - long
-	 */
-	public static double DOJI_LONG_THRESHOLD_PERC = 0.033;
-	
-	/* TODO: define criteria for avg shadow */
-	/* TODO: define criteria for avg body */
+	private double body_len 		= 0;
+	private double upper_shadow_len = 0;
+	private double lower_shadow_len = 0;
+	private double amp 				= 0;
 	
 	private int direction;
-	private CandlePatternEnum simplePattern;
+	//private PatternEnum simplePattern;
+	//private LENGTH_TYPE bodyType;
+	//private LENGTH_TYPE upperShadowType;
+	//private LENGTH_TYPE lowerShadowType;
 	
 	/**
 	 * Constructor
 	 */
 	public Candle( long time, double high, double low, double open, double close, double wap, long volume, int count) {
 		super(time,high,low,open,close,wap,volume,count);
-		calcDirection();
-		calcSimplePattern();
+		
+		calcProperties();
 	}
-
-	public CandlePatternEnum getSimplePattern(){
+/*
+	public PatternEnum getSimplePattern(){
 		return this.simplePattern;
 	}
 	
-	/**
-	 * Determines pattern of this candlestick 
-	 * based solely on its properties. No consideration 
-	 * to previous candlesticks or patterns is given here
-	 */
-	private void calcSimplePattern(){
-		double open = open();
-		double close = close();
-		double high = high();
-		double low = low();
-		
-		//find the difference between open and close
-		double dBody = open-close;	
-		double dShadows = high-low;
-		double deviationYesOrNo = open*DOJI_BODY_RANGE_PERC;
-		
-		//determine if the candlestick is Doji and which one
-		if(dBody<=deviationYesOrNo){			
-			simplePattern = CandlePatternEnum.DOJI;
-			
-			//equal or above this range (for both legs) legs are considered long
-			double longLegThreshold = open*DOJI_LONG_THRESHOLD_PERC;
-			
-			//determine what kind of Doji
-			switch(direction){
-				case WHITE:
-					if(high==close&&low<open && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePatternEnum.DRAGONFLY_DOJI;
-					else if(high>close && low==open && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePatternEnum.TOMBSTONE_DOJI;
-					else if(high>close && low<open && dShadows > longLegThreshold) //check length of 2 legs together
-						simplePattern = CandlePatternEnum.LONG_LEGGED_DOJI;
-						break;
-				case BLACK:
-					if(high==open&&low<close && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePatternEnum.DRAGONFLY_DOJI;
-					else if(high>open && low==open && dShadows>longLegThreshold/2)	//check length of 1 leg 
-						simplePattern = CandlePatternEnum.TOMBSTONE_DOJI;
-					else if(high>open && low<close && dShadows > longLegThreshold)  //check length of 2 legs together
-						simplePattern = CandlePatternEnum.LONG_LEGGED_DOJI;
-					break;
-				default:
-			}
-			return;
-		}
-		
-		//TODO recalculate based on average over previous values
-		boolean longBody = Math.abs(dBody) > open*DOJI_LONG_THRESHOLD_PERC; //candlestick is considered long
-		boolean shortBody = Math.abs(dBody) < open*DOJI_LONG_THRESHOLD_PERC/3; //candlestick is considered short
-		
-		if(direction==WHITE){	//white 
-			if(longBody){
-				if((open ==low || Math.abs(open-low) < deviationYesOrNo)&&close==high || Math.abs(high-close)<deviationYesOrNo)	
-					 simplePattern = CandlePatternEnum.BULLISH_MARABOZU;
-			}
-			else{	//short or average body
-				if(low==open || Math.abs(open-low)<deviationYesOrNo){	//no lower shadow
-					if(Math.abs(high-close) > open*DOJI_LONG_THRESHOLD_PERC)	//upper shadow is longer than average
-						simplePattern = CandlePatternEnum.LONG_UPPER_SHADOW;
-				}
-				else {	//both shadows
-					if(shortBody){
-						if(open-low>open*DOJI_LONG_THRESHOLD_PERC && high-close > open*DOJI_LONG_THRESHOLD_PERC)	//both shadows are long
-							simplePattern = CandlePatternEnum.HIGH_WAVE;
-						else 
-							simplePattern = CandlePatternEnum.SPINNING_TOP;
-					}
-				}
-			}
-		}
-		else if(direction==BLACK){ 	//black
-			if(longBody){
-				if((open ==high || Math.abs(open-high) < deviationYesOrNo)&& close==low || Math.abs(close-low)<deviationYesOrNo)	
-					simplePattern = CandlePatternEnum.BEARISH_MARABOZU;
-			}
-			else{	//short or average body
-				if(high==open|| Math.abs(high-open)<deviationYesOrNo){	//no upper shadow
-					if(Math.abs(close -low)> open*DOJI_LONG_THRESHOLD_PERC)	//lower shadow is longer than average
-						simplePattern = CandlePatternEnum.LONG_LOWER_SHADOW;
-				}
-				else {	//both shadows
-					if(shortBody){
-						if(high-open > open*DOJI_LONG_THRESHOLD_PERC && (close-low)> open*DOJI_LONG_THRESHOLD_PERC)		//both shadows are long
-							simplePattern = CandlePatternEnum.HIGH_WAVE;
-						else 
-							simplePattern = CandlePatternEnum.SPINNING_TOP;
-					}
-				}
-			}
-		}
-		//if case not specified above, simplePattern remains null
-	}
+	public void setSimplePattern(PatternEnum p){
+		this.simplePattern = p;
+	}*/
 	
 	/**
 	 * Returns candlestick direction
@@ -161,21 +54,131 @@ public class Candle extends Bar {
 		return this.direction;
 	}
 	
+	/**
+	 * @return the body_len
+	 */
+	public double getBody_len() {
+		return body_len;
+	}
+
+	/**
+	 * @param body_len the body_len to set
+	 */
+	public void setBody_len(double body_len) {
+		this.body_len = body_len;
+	}
+
+	/**
+	 * @return the upper_shadow_len
+	 */
+	public double getUpper_shadow_len() {
+		return upper_shadow_len;
+	}
+
+	/**
+	 * @param upper_shadow_len the upper_shadow_len to set
+	 */
+	public void setUpper_shadow_len(double upper_shadow_len) {
+		this.upper_shadow_len = upper_shadow_len;
+	}
+
+	/**
+	 * @return the lower_shadow_len
+	 */
+	public double getLower_shadow_len() {
+		return lower_shadow_len;
+	}
+
+	/**
+	 * @param lower_shadow_len the lower_shadow_len to set
+	 */
+	public void setLower_shadow_len(double lower_shadow_len) {
+		this.lower_shadow_len = lower_shadow_len;
+	}
+
+	/**
+	 * @return the bodyType
+	 */
+/*	public LENGTH_TYPE getBodyType() {
+		return bodyType;
+	}*/
+
+	/**
+	 * @param lenT the lenT to set
+	 */
+/*	public void setBodyType(LENGTH_TYPE lenT) {
+		this.bodyType = lenT;
+	}*/
+
+	/**
+	 * @return the upperShadowType
+	 */
+/*	public LENGTH_TYPE getUpperShadowType() {
+		return upperShadowType;
+	}*/
+
+	/**
+	 * @param upperShadowType the upperShadowType to set
+	 */
+/*	public void setUpperShadowType(LENGTH_TYPE upperShadowType) {
+		this.upperShadowType = upperShadowType;
+	}*/
+
+	/**
+	 * @return the lowerShadowType
+	 */
+/*	public LENGTH_TYPE getLowerShadowType() {
+		return lowerShadowType;
+	}*/
+
+	/**
+	 * @param lowerShadowType the lowerShadowType to set
+	 */
+/*	public void setLowerShadowType(LENGTH_TYPE lowerShadowType) {
+		this.lowerShadowType = lowerShadowType;
+	}*/
+
+	/**
+	 * @return the amp
+	 */
+	public double getAmp() {
+		return amp;
+	}
+
+	/**
+	 * @param amp the amp to set
+	 */
+	public void setAmp(double amp) {
+		this.amp = amp;
+	}	
 	
 	/**
-	 * Calculates candlestick direction, based on 
-	 * open and close prices. 
+	 * Calculates candlestick direction, amplitude, 
+	 * length of the body and each shadow
 	 */
-	private void calcDirection(){
-		//find the difference between open and close
-		double d = open()-close();	
-				
-		if(d==0){
-			direction = DOJI;
+	private void calcProperties(){
+		amp 	 = high() - low();
+		body_len = open() - close();
+			
+		if(body_len==0){
+			direction = Constants.DIR_NONE;
 		}
-		else if(d<0)
-			direction = BLACK;
+		else if(body_len>0)
+			direction = Constants.DIR_BLACK;
 		else
-			direction = WHITE;	
+			direction = Constants.DIR_WHITE;	
+		
+		switch(direction){
+		case Constants.DIR_WHITE:	
+			upper_shadow_len = high() - close();
+			lower_shadow_len = open() - low();
+			break;
+			default: //BLACK or DOJI
+			upper_shadow_len = high() - open();
+			lower_shadow_len = close() - low();
+		}
+		
+		//get rid of minus sign if any
+		body_len = Math.abs(body_len);
 	}
 }

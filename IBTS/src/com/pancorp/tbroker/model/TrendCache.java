@@ -4,13 +4,15 @@ import java.util.LinkedList;
 
 import org.apache.logging.log4j.LogManager;
 
+import com.pancorp.tbroker.util.Constants;
+import com.pancorp.tbroker.util.Globals;
+
 public class TrendCache extends LinkedList<Candle> {
 	private static org.apache.logging.log4j.Logger lg = LogManager.getLogger(TrendCache.class);
 	private static final long serialVersionUID = 2939335574409341461L;
-	public static final int MIN_TREND_CANDLES = 3;
-	public static final int MAX_TREND_CANDLES = 10;
+
 	
-	boolean up = false;
+	int direction = Constants.DIR_NONE;
 
 	public TrendCache() {
 		super();
@@ -21,21 +23,15 @@ public class TrendCache extends LinkedList<Candle> {
 	 * removes the last element. If trend interrupts,
 	 * clears the queue, and starts new trend, if applicable.
 	 */
-	public int trend(Candle c) {
+	public int checkTrend(Candle c) {
 		//check most recent 
 		Candle last = peekFirst();
 		
-		if(last==null)  {//cache is empty		
-			switch(c.getDirection()){
-			case Candle.WHITE:
-				up = true;
-				break;
-			case Candle.DOJI:
-				return 0;	//no direction, do nothing to empty list
-				default:
-					up = false;
-			}
-			addFirst(c); //start a trend
+		if(last==null)  {//cache is empty	
+			if(c.getDirection()==Constants.DIR_NONE)  //Doji, not part of a trend
+				;//TODO add a reversal signal
+			else
+				addFirst(c); //start a trend
 			
 			return size();
 		}
@@ -49,18 +45,18 @@ public class TrendCache extends LinkedList<Candle> {
 			if(diffHigh==0 || diffLow==0)	//no trend
 				clear();			
 			else if(diffHigh<0 && diffLow < 0)		//uptrend
-				up = true;
+				direction = Constants.DIR_WHITE;
 			else if(diffHigh>0 && diffLow > 0) //downtrend
-				up = false;
+				direction = Constants.DIR_BLACK;
 			else 	//no trend
 				clear();				
 			
 			this.addFirst(c);
-			return size();
+			return direction;
 		}
 
 		//cache size > 1
-		if(up){  //uptrend
+		if(direction > 0){  //uptrend
 			if(diffHigh < 0 && diffLow < 0)   //uptrend continues
 				;  
 			else
@@ -74,7 +70,7 @@ public class TrendCache extends LinkedList<Candle> {
 		}
 
 		addFirst(c);	// add new candle in any case
-		if(size()>MAX_TREND_CANDLES)
+		if(size()>Globals.MAX_TREND_CANDLES)
 			removeLast();
 		
 		return size();	

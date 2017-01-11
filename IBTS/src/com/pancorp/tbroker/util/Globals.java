@@ -117,8 +117,35 @@ public enum Globals {
 	public static double PRICE_PREV_CLOSE_MIN			= 9.99;			// no penny stocks, reasonable amount to profit
 	public static double PRICE_PREV_CLOSE_MAX			= 100.00;		// max account capacity for 100 units
 	public static double PRICE_DAY_RANGE_PERC_MIN		= 0.049;		// high volatility
-
 	
+	//for calculation averages: difference between MIN and MAX must be > 1
+	public static int MIN_CALC_CANDLES = 1;
+	public static int MAX_CALC_CANDLES = 50;
+	
+	public static int MIN_TREND_CANDLES = 3;
+	public static int MAX_TREND_CANDLES = 10;
+
+	/**
+	 * Deviation percent of the opening price for estimating body length 
+	 * when defining candlestick pattern.
+	 * 
+	 * For the definition of Doji:
+	 * 
+	 *  Point is the smallest possible price change on the left side of the decimal point. ($1 ?)
+	 *  
+	 *  1/8 point for $20 stock:    0.00630517*100%
+	 *  1 1/4 point for $200 stock: 0.00625*100%
+	 */
+	public static double PATTERN_BODY_DEVIATION_PERC				= 0.006;	//0.6%
+	
+	/**
+	* Percent from the open price that allowed for Doji pattern (considered the same)
+	*/
+	//public static final double _DOJI_LEG_RANGE_PERC = 0.01;
+	
+	/**
+	 * 
+	 */
 	private static double accountTotal		= 10000.00;
 	
 	public static double getAccountTotal(){

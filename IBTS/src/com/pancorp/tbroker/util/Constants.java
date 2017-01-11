@@ -8,6 +8,11 @@ public enum Constants {
 	///////////////////////////////////////////////////////////////
 	//		CONSTANTS
 	///////////////////////////////////////////////////////////////
+	/** Values for candlestick direction */
+	public static final int DIR_BLACK 	= -1;
+	public static final int DIR_WHITE 	= 1;
+	public static final int DIR_NONE	= 0;
+	
 	/**
 	 * Percent of total account amount, that I can afford to lose, 
 	 * shared between all trades; ex $10000 * 0.05 = $500

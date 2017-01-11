@@ -2,18 +2,32 @@ package com.pancorp.tbroker.data;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
 import com.ib.client.Contract;
+import com.pancorp.tbroker.event.Events;
 import com.pancorp.tbroker.event.TBrokerEvent;
+import com.pancorp.tbroker.model.CalculationCache;
 import com.pancorp.tbroker.model.Candle;
-import com.pancorp.tbroker.model.PatternLibrary;
+import com.pancorp.tbroker.model.PatternEnum;
+import com.pancorp.tbroker.model.PatternCache;
 import com.pancorp.tbroker.model.TrendCache;
 
 public class DataAnalyzer {
-	LinkedList<Candle> pattern;
-	TrendCache trend;
+	//LinkedList<Candle> pattern;
+	static TrendCache trendCache;
+	static CalculationCache calcCache;
+	static PatternCache patternCache;
+	
+	Map<PatternEnum,LinkedList<Candle>> lib;
+	private DataAnalyzer() {
+		lib = new HashMap<>();
+		trendCache = new TrendCache();
+		calcCache = new CalculationCache();
+		patternCache = new PatternCache();
+	}
 	
 	public Contract invoke(){
 		Contract c = new Contract();
@@ -25,11 +39,12 @@ public class DataAnalyzer {
 		
 		//HashMap<String,Stack<Candle>> map = new HashMap<>();
 		
-		list =  new LinkedList<>();
+		//list =  new LinkedList<>();
 		
 		loop:
 		while(working){
 		// 15-minute timeframe to help determine the trend throughout the duration of the trade
+			//TODO
 		 long time=0;
 		 double high=0;
 		 double low=0;
@@ -40,9 +55,18 @@ public class DataAnalyzer {
 		 int count = 0;
 		candle = new Candle(time, high, low,open, close, wap, volume, count);
 		
-		e =  PatternLibrary.matchPattern(list, candle);
+		calcCache.recalc(candle);
+		//int trend = trendCache.checkTrend(candle);
+		
+		//not enough candles to define downswing
+		//if(q.size()<MIN_TREND_CANDLES)
+		//	return Events.NONE;
+		
+		patternCache.addCandle(candle, trendCache);
+	
+	
 		//TODO what patterns to save for monitoring
-		switch(e.getAction()){
+		/*switch(e.getAction()){
 		case BUY:
 			
 			break;
@@ -58,7 +82,7 @@ public class DataAnalyzer {
 		default:
 			break;
 		
-		}
+		}*/
 		
 		
 		//in.setTicker("IBM");
