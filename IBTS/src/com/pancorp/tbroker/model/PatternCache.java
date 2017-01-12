@@ -22,7 +22,7 @@ public class PatternCache extends LinkedList<Candle> {
 	int direction = Constants.DIR_NONE;
 	
 	//LinkedList<Candle> 
-	Map<PatternEnum,ArrayList<Candle>> patterns;
+	static volatile Map<PatternEnum,ArrayList<Candle>> patterns;
 
 	public PatternCache() {
 		super();
@@ -43,27 +43,31 @@ public class PatternCache extends LinkedList<Candle> {
 	 * It patter matches, partially or whole ...
 	 */
 	public void addCandle(Candle c, TrendCache trend) {
+		int trendSize = trend.size();
+		int trendDirection = trend.direction;
+		boolean foundPattern = false;
+		
+		if(trendSize<=Globals.MIN_TREND_CANDLES){
+			//not enough candles, just add a new one if applicable
+			trend.checkTrend(c);
+			return;
+		}
 		
 		for(int i=0;i<PatternEnum.values().length;i++) {
 			//PatternEnum.values().
 			//PatternEnum p = c.getSimplePattern();
-			int trendSize = trend.size();
-			int trendDirection = trend.direction;
-			boolean foundPattern = false;
-			
-			if(trendSize<=Globals.MIN_TREND_CANDLES){
-				//not enough candles, just add a new one if applicable
-				trend.checkTrend(c);
-				return;
-			}
-			
 			//trend size is min_trend + 1 (4), so last candle possibly is 
 			//the first one of a reversal pattern 
 			if(trend.direction!=c.getDirection()){	//something happening!
 				switch(c.getDirection()){
 				case Constants.DIR_WHITE:	//white candle in a black trend
 					//Stack<Candle> candleStack = new Stack<>();
-			
+					boolean found = ThreeLinesStrike(c, trend);
+					if(found){
+						//TODO fire event? wait for confirmation of the trend?
+						break;
+					}
+						found = AbandonedBaby(c, trend);
 					break;
 				case Constants.DIR_BLACK:	//black candle in a white trend
 					break;
@@ -90,10 +94,28 @@ public class PatternCache extends LinkedList<Candle> {
 			}
 			addFirst(c); //start a trend
 			
-			return size();
-		
 		
 		return size();	
+	}
+	
+	/**
+	 * AKA Morning Doji Star	70%
+	 * 
+	 * -->Three day pattern after a downswing
+	 * -->First candle is black, SECOND CANDLE IS DOJI, third one is white, 
+	 *    better than the average candle.
+	 * -->Ideally second candle has a GAP  on one (or both) side(s)
+	 * -->Third candle should push at least 1/2 way into the first candle
+	 * -->A strong Bullish Reversal Signal (70% accuracy)
+	 *  
+	 * @param c
+	 * @param trend
+	 * @return
+	 */
+	private static boolean AbandonedBaby(Candle c, TrendCache trend){
+		boolean foundPattern = false;
+		
+		return foundPattern;
 	}
 	
 	/**
@@ -102,42 +124,42 @@ public class PatternCache extends LinkedList<Candle> {
 	 * near the intrabar low
 	 * --> 4th bar opens even lower, but reverses in a wide range and closes 
 	 * above the high if the first candle in series. No lower shadow.
+	 * -->Bullish reversal signal (84% accuracy)
 	 * 
 	 * @param c
 	 * @param trend
 	 * @return
 	 */
-	private static boolean ThreeLineStrike(Candle c, TrendCache trend){
+	private static boolean ThreeLinesStrike(Candle c, TrendCache trend){
 		boolean foundPattern = false;
+		//check candle shape first
+		if(c.getBody_len() <= CalculationCache.AVG_BODY_LEN*2 && c.getLower_shadow_len()>0)
+			return false;
 		
-		//1  Three Line Strike (80%)
 		//		-->3 previous black candles within downtrend, each posts lower low and closes near the intrabar low
 		//for(int i=0;i<3;i++){
 			//first one has to be the lowest
 			Candle cd1 = trend.removeFirst();
-			double low1 = cd1.low();
+			//double low1 = cd1.low();
 			double lowShadow1 = cd1.getLower_shadow_len();
-			double high1 = cd1.high();
+			//double high1 = cd1.high();
 			//candleStack.push(cd1);
 			//if(lowShadow1 <= CalculationCache.AVG_LOWER_SHADOW_LEN/2)	//short low shadow - close to intrabar low
 			
 			//previous higher low
 			Candle cd2 = trend.removeFirst();
-			double low2 = cd2.low();
+			//double low2 = cd2.low();
 			double lowShadow2 = cd2.getLower_shadow_len();
-			double high2 = cd2.high();
+			//double high2 = cd2.high();
 			//candleStack.push(cd1);
 			
 			//this one even higher low
 			Candle cd3 = trend.removeFirst();
 			double low3 = cd3.low();
 			double lowShadow3 = cd3.getLower_shadow_len();
-			double high3 = cd3.high();
+			//double high3 = cd3.high();
 			
-			//put back candles
-			trend.addFirst(cd3);
-			trend.addFirst(cd2);
-			trend.addFirst(cd1);
+			
 			
 			if(lowShadow1 > CalculationCache.AVG_LOWER_SHADOW_LEN/2||
 				lowShadow2 > CalculationCache.AVG_LOWER_SHADOW_LEN/2 ||
@@ -152,10 +174,23 @@ public class PatternCache extends LinkedList<Candle> {
 			//	-->current white candle opens even lower but reverses 
 			//in a wide range and closes above the high
 			// of the first candle in series. No lower shadow
-			if(c.low()<low3 && c.getLower_shadow_len()==0 && c.close()> cd1.high()){
+			if(c.low()<low3 && c.close()> cd1.high()){
 				foundPattern = true;
+				
+				ArrayList<Candle> arr = new ArrayList<>();
+				arr.add(c);
+				arr.add(cd1);
+				arr.add(cd2);
+				arr.add(cd3);
 				//TODO assign what pattern found or what event to fire
+				patterns.put(PatternEnum.THREE_LINE_STRIKE, arr);
+				
+				//need to wait for confirmation of the trend
 			}
+			//put candles back in cache
+			trend.addFirst(cd3);
+			trend.addFirst(cd2);
+			trend.addFirst(cd1);
 		
 		return foundPattern;
 	}
@@ -198,7 +233,7 @@ public class PatternCache extends LinkedList<Candle> {
 	 * based solely on its properties. No consideration 
 	 * to previous candlesticks or patterns is given here
 	 */
-	private void calcSimplePattern(Candle c){
+	/*private void calcSimplePattern(Candle c){
 		PatternEnum simplePattern = null;
 		//double open = open();
 		//double close = close();
@@ -211,7 +246,7 @@ public class PatternCache extends LinkedList<Candle> {
 		//double deviationYesOrNo = open*DOJI_BODY_RANGE_PERC;
 		
 		//determine if the candlestick is Doji and which one
-		if(c.getBody_len()<=c.open()*Globals.PATTERN_BODY_DEVIATION_PERC){			
+		if(c.getBody_len()==0 ||c.getBody_len()<=c.open()*Globals.PATTERN_BODY_DEVIATION_PERC){			
 			simplePattern = PatternEnum.DOJI;
 			
 			//equal or above this range (for both legs) legs are considered long
@@ -285,7 +320,7 @@ public class PatternCache extends LinkedList<Candle> {
 			}
 		}
 		//if case not specified above, simplePattern remains null
-	}
+	}*/
 
 
 }

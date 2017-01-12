@@ -35,10 +35,16 @@ public enum PatternEnum {
 	ONE_WHITE_SOLDIER(2),
 	EVENING_DOJI_STAR(3),
 	EVENING_STAR_REVERSAL(3),
-	RISING_THREE(5),
-	MORNING_STAR_REVERSAL(3),
-	MORNING_DOJI_STAR(3),
+	
+	MORNING_STAR_REVERSAL(3),	
 	FALLING_THREE(5),
+	
+	//bullish continuation
+	RISING_THREE(5),
+	
+	//bullish reversal signals
+	ABANDONED_BABY(3), //MORNING_DOJI_STAR(3),
+	THREE_LINE_STRIKE(4)
 	;
 	
 	private final int size;
