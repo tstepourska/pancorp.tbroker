@@ -33,8 +33,12 @@ public class Candle extends Bar {
 	 * Constructor
 	 */
 	public Candle( long time, double high, double low, double open, double close, double wap, long volume, int count) {
-		super(time,high,low,open,close,wap,volume,count);
-		
+		super(time,high,low,open,close,wap,volume,count);	
+		calcProperties();
+	}
+
+	public Candle(Bar b){
+		super(b.time(),b.high(),b.low(),b.open(),b.close(),b.wap(),b.volume(),b.count());
 		calcProperties();
 	}
 /*

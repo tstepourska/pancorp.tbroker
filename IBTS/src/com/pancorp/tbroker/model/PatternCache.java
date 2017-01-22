@@ -85,12 +85,12 @@ public class PatternCache extends LinkedList<Candle> {
 			
 			switch(c.getDirection()){
 			case Constants.DIR_WHITE:
-				up = true;
+				//up = true;
 				break;
 			case Constants.DIR_NONE:
 				return 0;	//no direction, do nothing to empty list
 				default:
-					up = false;
+					//up = false;
 			}
 			addFirst(c); //start a trend
 			

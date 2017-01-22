@@ -18,12 +18,17 @@ import com.pancorp.tbroker.strategy.StrategySelector;
 //import com.pancorp.tbroker.util.TLogger;
 import com.pancorp.tbroker.util.Utils;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * @author 
  *
  */
 public class TBroker{
 	private static Logger lg = LogManager.getLogger(TBroker.class);
+	
+	private List<DataAnalyzer> threads;
 	
 	private static void init(String[] args) throws Exception {
 		if(lg.isTraceEnabled())
@@ -37,6 +42,9 @@ public class TBroker{
 	 */
 	public static void main(String[] args) {
 		
+		TBroker tb = new TBroker();
+		
+		
 		//1. Initialize global properties and variables
 		try {
 			init(args);
@@ -45,6 +53,8 @@ public class TBroker{
 			Utils.logError(lg, e);
 		}
 		
+		//2 check local database first - account info
+		List<AccountInfo> localAList = getAccountInfo();
 		//2. Check the account amount and margin
 		//2.a. Initialize TBrokerApi
 		TBrokerApi api = new TBrokerApi();
@@ -55,6 +65,24 @@ public class TBroker{
 		
 		if(api.isConnected()){
 			lg.trace("connected");
+			
+		List<AccountInfo> ibAList = api.accountList();
+		Utils.synchronizeAccountInfo(localAlist, ibAList);
+		
+		api.requestMarketData();
+		
+		//callback will be in API
+		//load into local database
+		
+		//run queries to select up to 99 records to monitor
+		List<Contract> contracts = selectToMonitor();
+		Iterator<Contract> it = contracts.iterator();
+		
+		while(it.hasNext()){
+			DataAnalyzer t = new DataAnalyzer(it.next(), tb);
+			t.start();
+			tb.threads.add(t);
+		}
 /*
 		
 		try {
@@ -117,5 +145,29 @@ public class TBroker{
 		
 		//record trade stats
 
+	}
+	
+	public synchronized void buySignal(Contract c, DataAnalyzer d){
+		//callback from DataAnalyzer,
+		Iterator<DataAnalyzer> it = this.threads.iterator();
+		while(it.hasNext()){
+			DataAnalyzer da = it.next();
+			if(da.equals(d))
+				continue;
+			
+			da.setWorking(false); //shutdown all except the one where signal has been found
+		}
+	}
+	
+	public void sellSignal(){
+		
+	}
+	
+	public boolean endOfDay(){
+		return true;
+	}
+	
+	public void closeAllPosiitons(){
+		
 	}
 }

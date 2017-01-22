@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import com.ib.client.Contract;
+import com.ib.controller.NewContract;
 import com.pancorp.tbroker.condition.ICondition;
+import com.pancorp.tbroker.handler.StrategyConnectionHandlerAdapter;
 
-public abstract class StrategyAbstract extends Thread implements IStrategy {
+public abstract class StrategyAbstract extends StrategyConnectionHandlerAdapter implements IStrategy {
 	
 	
 	/**
@@ -113,7 +115,7 @@ public abstract class StrategyAbstract extends Thread implements IStrategy {
 	 */
 	public boolean open = false;
 	
-	private Contract contract;
+	protected NewContract contract;
 	
 
 	//////////////////////////////////////////////////////////////////////////////////
@@ -123,14 +125,14 @@ public abstract class StrategyAbstract extends Thread implements IStrategy {
 	/**
 	 * @return the contract
 	 */
-	public Contract getContract() {
+	public NewContract getContract() {
 		return this.contract;
 	}
 
 	/**
 	 * @param c the contract to set
 	 */
-	public void setContract(Contract c) {
+	public void setContract(NewContract c) {
 		this.contract = c;
 	}
 

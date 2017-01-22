@@ -9,28 +9,35 @@ import java.util.Stack;
 import com.ib.client.Contract;
 import com.pancorp.tbroker.event.Events;
 import com.pancorp.tbroker.event.TBrokerEvent;
+import com.pancorp.tbroker.main.TBroker;
 import com.pancorp.tbroker.model.CalculationCache;
 import com.pancorp.tbroker.model.Candle;
 import com.pancorp.tbroker.model.PatternEnum;
 import com.pancorp.tbroker.model.PatternCache;
 import com.pancorp.tbroker.model.TrendCache;
 
-public class DataAnalyzer {
-	//LinkedList<Candle> pattern;
-	static TrendCache trendCache;
-	static CalculationCache calcCache;
-	static PatternCache patternCache;
+public class DataAnalyzer extends Thread{
+	
+	TrendCache trendCache;
+	CalculationCache calcCache;
+	PatternCache patternCache;
+	
+	Contract contract;
+	TBroker tbroker;
 	
 	Map<PatternEnum,LinkedList<Candle>> lib;
-	private DataAnalyzer() {
+	public DataAnalyzer(Contract c, TBroker tb) {
+		this.contract = c;
+		this.tbroker = tb;
+		
 		lib = new HashMap<>();
 		trendCache = new TrendCache();
 		calcCache = new CalculationCache();
 		patternCache = new PatternCache();
 	}
 	
-	public Contract invoke(){
-		Contract c = new Contract();
+	public void run(){
+
 		Candle candle;
 		boolean working = true;
 		TBrokerEvent e = null;
@@ -64,7 +71,8 @@ public class DataAnalyzer {
 		
 		patternCache.addCandle(candle, trendCache);
 	
-	
+		//put into database:
+		//DataFactory.insertCandle(candle);
 		//TODO what patterns to save for monitoring
 		/*switch(e.getAction()){
 		case BUY:
