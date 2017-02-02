@@ -4,8 +4,8 @@ public enum PatternEnum {
 	
 	//simple: single candle patterns
 	DOJI(1),				//no body (or within few pennies, either direction), short or avg shadows
-	TOMBSTONE_DOJI(1),		//foji, long top shadow, no bottom
-	DRAGONFLY_DOJI(1),		//foji, long lower shadow, no top
+	TOMBSTONE_DOJI(1),		//doji, long top shadow, no bottom
+	DRAGONFLY_DOJI(1),		//doji, long lower shadow, no top
 	LONG_LEGGED_DOJI(1),	//doji, long both shadows
 	BULLISH_MARABOZU(1),	//white, no shadows, long body
 	BEARISH_MARABOZU(1),	//black, no shadows, long body
