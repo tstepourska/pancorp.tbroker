@@ -8,13 +8,13 @@ public enum PatternEnum {
 	DRAGONFLY_DOJI(1),		//foji, long lower shadow, no top
 	LONG_LEGGED_DOJI(1),	//doji, long both shadows
 	BULLISH_MARABOZU(1),	//white, no shadows, long body
-	BEARISH_MARABOZU(1),	//black, no shadows, long bodu
+	BEARISH_MARABOZU(1),	//black, no shadows, long body
 	SPINNING_TOP(1),	//short body, short or avg shadows, or no shadow(s), can be black or white
 	HIGH_WAVE(1),		//has both shadows 2-3 times longer than spinning top, can be black or white
 	LONG_LOWER_SHADOW(1),	//black, avg body, the longer the shadow, the more bullish the candle
 	LONG_UPPER_SHADOW(1),	//white,avg body, the longer the shadow, the more bearish the candle
 	
-	//complex: require checking previous values
+	//complex: require checking previous values that are kept in queue
 	HANGMAN(1),
 	HAMMER(1),
 	TWEEZER_BOTTOM(2),
